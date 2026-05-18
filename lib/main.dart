@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'screens/mood_home_screen.dart';
@@ -17,6 +16,7 @@ class MoodiaryApp extends StatelessWidget {
     return MaterialApp(
       title: 'Moodiary',
       debugShowCheckedModeBanner: false,
+      scrollBehavior: const AppScrollBehavior(),
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFFFC857)),
         useMaterial3: true,
@@ -28,8 +28,10 @@ class MoodiaryApp extends StatelessWidget {
 }
 
 class AppScrollBehavior extends MaterialScrollBehavior {
+  const AppScrollBehavior();
+
   @override
-  Set<PointerDeviceKind> get dragDevices => {
+  Set<PointerDeviceKind> get dragDevices => const {
         PointerDeviceKind.touch,
         PointerDeviceKind.mouse,
         PointerDeviceKind.trackpad,
