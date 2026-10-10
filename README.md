@@ -180,3 +180,122 @@ flutter pub get
 ```
 
 For more details, see the official [Flutter iOS deployment guide](https://docs.flutter.dev/deployment/ios).
+
+
+
+## Building for Android (APK)
+
+### Prerequisites
+
+To build Moodiary for Android, you need:
+
+- [Flutter SDK](https://docs.flutter.dev/get-started/install) installed and configured.
+- [Android Studio](https://developer.android.com/studio) with the Android SDK.
+- An Android emulator or a physical Android device.
+
+### 1. Install dependencies
+
+From the project root, run:
+
+```bash
+flutter pub get
+```
+
+### 2. Check your Android setup
+
+Verify that Flutter and the Android toolchain are configured correctly:
+
+```bash
+flutter doctor
+```
+
+Resolve any reported Android SDK or license issues. If necessary, accept the Android SDK licenses:
+
+```bash
+flutter doctor --android-licenses
+```
+
+### 3. Run on an Android device
+
+List available devices:
+
+```bash
+flutter devices
+```
+
+Run Moodiary on a connected device or emulator:
+
+```bash
+flutter run
+```
+
+### 4. Build a release APK
+
+To generate a release APK, run:
+
+```bash
+flutter build apk --release
+```
+
+The APK will be generated at:
+
+```text
+build/app/outputs/flutter-apk/app-release.apk
+```
+
+You can transfer this file to an Android device and install it.
+
+### 5. Build smaller APKs for specific architectures (optional)
+
+To generate separate APKs for supported CPU architectures, run:
+
+```bash
+flutter build apk --split-per-abi
+```
+
+This generates architecture-specific APKs in:
+
+```text
+build/app/outputs/flutter-apk/
+```
+
+For example:
+
+- `app-armeabi-v7a-release.apk`
+- `app-arm64-v8a-release.apk`
+- `app-x86_64-release.apk`
+
+These APKs are smaller than a universal APK because each targets a specific CPU architecture. For most modern Android phones, the `arm64-v8a` version is appropriate.
+
+### 6. Install the APK (optional)
+
+With an Android device connected and USB debugging enabled, install the release APK using:
+
+```bash
+flutter install
+```
+
+Alternatively, copy `app-release.apk` to your phone and open it. You may need to allow installation from that source in your Android settings.
+
+### Useful commands
+
+```bash
+# Run the app
+flutter run
+
+# Build a release APK
+flutter build apk --release
+
+# Build APKs for individual CPU architectures
+flutter build apk --split-per-abi
+
+# Install on a connected device
+flutter install
+
+# Clean and rebuild
+flutter clean
+flutter pub get
+flutter build apk --release
+```
+
+For more details, see the official [Flutter Android deployment guide](https://docs.flutter.dev/deployment/android).
