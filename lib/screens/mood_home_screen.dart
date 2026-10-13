@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../widgets/mood_picker.dart';
 import '../widgets/mood_timeline.dart';
 
+/// A screen that displays the mood picker and the mood timeline.
 class MoodHomeScreen extends StatelessWidget {
   const MoodHomeScreen({super.key});
 

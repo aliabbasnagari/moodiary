@@ -5,6 +5,7 @@ import 'mood_face_painter.dart';
 
 /// Convenience wrapper around [MoodFacePainter] so callers don't have to
 /// build a `CustomPaint` + `SizedBox` every time.
+/// This widget is used in the mood selection screen and the mood history screen.
 class MoodFace extends StatelessWidget {
   const MoodFace({
     super.key,

@@ -5,9 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'screens/mood_home_screen.dart';
 
 void main() {
-  runApp(const ProviderScope(
-    child: MoodiaryApp()
-    ));
+  runApp(const ProviderScope(child: MoodiaryApp()));
 }
 
 class MoodiaryApp extends StatelessWidget {
@@ -20,9 +18,7 @@ class MoodiaryApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       scrollBehavior: const AppScrollBehavior(),
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFFFFC857)
-          ),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFFFC857)),
         useMaterial3: true,
         scaffoldBackgroundColor: const Color(0xFFFDF8F2),
       ),
