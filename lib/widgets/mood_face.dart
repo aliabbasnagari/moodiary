@@ -24,7 +24,10 @@ class MoodFace extends StatelessWidget {
       width: size,
       height: size,
       child: CustomPaint(
-        painter: MoodFacePainter(mood: mood, animation: animation),
+        painter: MoodFacePainter(
+          mood: mood,
+          animation: animation
+        ),
       ),
     );
   }
