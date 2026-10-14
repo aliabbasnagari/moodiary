@@ -11,11 +11,10 @@ A simple, cheerful Flutter app for logging how you feel. Tap a face to record yo
 - Material 3 theme with a warm, paper-like background.
 - Runs on Android, iOS, Web, Windows, macOS, and Linux.
 
-
 ## Screenshots
 
-| Empty state | After logging moods |
-| --- | --- |
+| Empty state                                  | After logging moods                                    |
+| -------------------------------------------- | ------------------------------------------------------ |
 | ![Empty state](screenshots/screenshot-1.png) | ![Timeline with entries](screenshots/screenshot-2.png) |
 
 ## Project structure
@@ -72,7 +71,6 @@ flutter pub run flutter_launcher_icons
 - **flutter_riverpod** for state management
 - **intl** for date/time formatting
 - **CustomPainter** for the mood faces
-
 
 ## Building for iOS
 
@@ -181,7 +179,6 @@ flutter pub get
 ```
 
 For more details, see the official [Flutter iOS deployment guide](https://docs.flutter.dev/deployment/ios).
-
 
 ## Building for Android (APK)
 
