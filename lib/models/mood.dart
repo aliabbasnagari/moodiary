@@ -24,3 +24,4 @@ class MoodEntry {
   final Mood mood;
   final DateTime loggedAt;
 }
+

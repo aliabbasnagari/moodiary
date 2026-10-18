@@ -28,3 +28,4 @@ final recentMoodEntriesProvider = Provider<List<MoodEntry>>((ref) {
   final all = ref.watch(moodEntriesProvider);
   return all.take(7).toList(growable: false);
 });
+
