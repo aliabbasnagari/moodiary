@@ -38,3 +38,4 @@ class AppScrollBehavior extends MaterialScrollBehavior {
         PointerDeviceKind.stylus,
       };
 }
+

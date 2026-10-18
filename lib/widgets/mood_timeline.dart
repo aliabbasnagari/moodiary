@@ -144,3 +144,4 @@ class _TimelineCardState extends State<_TimelineCard>
     return DateFormat('EEE, MMM d').format(when);
   }
 }
+

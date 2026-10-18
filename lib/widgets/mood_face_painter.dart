@@ -264,3 +264,4 @@ class MoodFacePainter extends CustomPainter {
   bool shouldRepaint(covariant MoodFacePainter old) =>
       old.mood != mood || old.animation != animation;
 }
+
