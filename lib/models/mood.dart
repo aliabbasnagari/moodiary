@@ -19,9 +19,10 @@ enum Mood {
 
 /// A single mood log entry.
 class MoodEntry {
-  const MoodEntry({required this.mood, required this.loggedAt});
+  const MoodEntry({required this.mood, required this.loggedAt, this.note});
 
   final Mood mood;
   final DateTime loggedAt;
+  final String? note;
 }
 
