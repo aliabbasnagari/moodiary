@@ -25,4 +25,3 @@ class MoodEntry {
   final DateTime loggedAt;
   final String? note;
 }
-
