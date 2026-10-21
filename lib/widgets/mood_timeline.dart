@@ -123,6 +123,16 @@ class _TimelineCardState extends State<_TimelineCard>
                               color: Colors.black54,
                             ),
                       ),
+                      if (entry.note != null && entry.note!.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: Text(
+                            entry.note!,
+                            style: Theme.of(context).textTheme.bodySmall,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
                     ],
                   ),
                 ],

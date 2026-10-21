@@ -26,26 +26,41 @@ class MoodPicker extends ConsumerWidget {
               _MoodPickerButton(
                 mood: mood,
                 size: faceSize,
-                onTap: () {
-                  ref.read(moodEntriesProvider.notifier).log(mood);
-                  ScaffoldMessenger.of(context)
-                    ..hideCurrentSnackBar()
-                    ..showSnackBar(
-                      SnackBar(
-                        duration: const Duration(milliseconds: 1200),
-                        backgroundColor: mood.color,
-                        content: Text(
-                          'Logged: ${mood.label}',
-                          style: const TextStyle(color: Colors.black87),
-                        ),
-                      ),
-                    );
-                },
+                onTap: () => _showNoteDialog(context, ref, mood),
               ),
           ],
         );
       },
     );
+  }
+
+  void _showNoteDialog(
+    BuildContext context,
+    WidgetRef ref,
+    Mood mood,
+  ) async {
+    final note = await showDialog<String?>(
+      context: context,
+      builder: (context) => _NoteDialog(mood: mood),
+    );
+
+    if (note != null) {
+      ref.read(moodEntriesProvider.notifier).log(mood, note);
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            duration: const Duration(milliseconds: 1200),
+            backgroundColor: mood.color,
+            content: Text(
+              note.isEmpty
+                  ? 'Logged: ${mood.label}'
+                  : 'Logged: ${mood.label} - ${note}',
+              style: const TextStyle(color: Colors.black87),
+            ),
+          ),
+        );
+    }
   }
 }
 
@@ -91,6 +106,60 @@ class _MoodPickerButtonState extends State<_MoodPickerButton> {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Dialog for entering an optional note when logging a mood.
+class _NoteDialog extends StatefulWidget {
+  final Mood mood;
+
+  const _NoteDialog({required this.mood});
+
+  @override
+  State<_NoteDialog> createState() => _NoteDialogState();
+}
+
+class _NoteDialogState extends State<_NoteDialog> {
+  final _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('Log ${widget.mood.label}'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('How are you feeling?'),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _controller,
+            autofocus: true,
+            decoration: const InputDecoration(
+              labelText: 'Add a note (optional)',
+              border: OutlineInputBorder(),
+            ),
+            maxLines: 3,
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(context, _controller.text),
+          child: const Text('Log'),
+        ),
+      ],
     );
   }
 }
