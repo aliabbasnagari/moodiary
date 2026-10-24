@@ -24,4 +24,12 @@ class MoodEntry {
   final Mood mood;
   final DateTime loggedAt;
   final String? note;
+
+  MoodEntry copyWith({DateTime? loggedAt}) {
+    return MoodEntry(
+      mood: mood,
+      loggedAt: loggedAt ?? this.loggedAt,
+      note: note,
+    );
+  }
 }

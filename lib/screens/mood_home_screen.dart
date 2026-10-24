@@ -1,11 +1,29 @@
 import 'package:flutter/material.dart';
 
+import '../models/mood.dart';
 import '../widgets/mood_picker.dart';
 import '../widgets/mood_timeline.dart';
+import '../widgets/mood_trends_chart.dart';
 
-/// A screen that displays the mood picker and the mood timeline.
-class MoodHomeScreen extends StatelessWidget {
+class MoodHomeScreen extends StatefulWidget {
   const MoodHomeScreen({super.key});
+
+  @override
+  State<MoodHomeScreen> createState() => _MoodHomeScreenState();
+}
+
+class _MoodHomeScreenState extends State<MoodHomeScreen>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabController = TabController(
+    length: 2,
+    vsync: this,
+  );
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,6 +34,13 @@ class MoodHomeScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: Colors.black87,
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(text: 'Log'),
+            Tab(text: 'Trends'),
+          ],
+        ),
       ),
       body: SafeArea(
         child: Center(
@@ -23,36 +48,46 @@ class MoodHomeScreen extends StatelessWidget {
             constraints: const BoxConstraints(maxWidth: 760),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: TabBarView(
+                controller: _tabController,
                 children: [
-                  const SizedBox(height: 16),
-                  Text(
-                    'How are you feeling?',
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Tap a face to log it.',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.black54,
-                        ),
-                  ),
-                  const SizedBox(height: 24),
-                  const MoodPicker(),
-                  const SizedBox(height: 40),
-                  Text(
-                    'Recent moods',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 12),
-                  const MoodTimeline(),
+                  _buildLogTab(),
+                  const MoodTrendsChart(),
                 ],
               ),
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildLogTab() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 16),
+        Text(
+          'How are you feeling?',
+          style: Theme.of(context).textTheme.headlineSmall,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Tap a face to log it.',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Colors.black54,
+              ),
+        ),
+        const SizedBox(height: 24),
+        const MoodPicker(),
+        const SizedBox(height: 40),
+        Text(
+          'Recent moods',
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        const SizedBox(height: 12),
+        const MoodTimeline(),
+      ],
     );
   }
 }
