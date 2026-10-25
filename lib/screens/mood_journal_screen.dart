@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../models/mood.dart';
 import '../state/mood_entries_provider.dart';
-import 'mood_face.dart';
+import '../widgets/mood_face.dart';
 
 class MoodJournalScreen extends ConsumerWidget {
   const MoodJournalScreen({super.key});
@@ -17,9 +17,9 @@ class MoodJournalScreen extends ConsumerWidget {
       return Center(
         child: Text(
           'No moods logged yet.',
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Colors.black54,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: Colors.black54),
         ),
       );
     }
@@ -27,11 +27,15 @@ class MoodJournalScreen extends ConsumerWidget {
     final groupedEntries = <String, List<MoodEntry>>{};
     for (final entry in entries) {
       final dayKey = DateFormat('yyyy-MM-dd').format(entry.loggedAt);
-      groupedEntries.update(dayKey, (value) => value..add(entry),
-          ifAbsent: () => [entry]);
+      groupedEntries.update(
+        dayKey,
+        (value) => value..add(entry),
+        ifAbsent: () => [entry],
+      );
     }
 
-    final sortedDays = groupedEntries.keys.toList()..sort((a, b) => b.compareTo(a));
+    final sortedDays = groupedEntries.keys.toList()
+      ..sort((a, b) => b.compareTo(a));
 
     return ListView.builder(
       padding: const EdgeInsets.all(16),
@@ -39,7 +43,9 @@ class MoodJournalScreen extends ConsumerWidget {
       itemBuilder: (context, i) {
         final dayKey = sortedDays[i];
         final dayEntries = groupedEntries[dayKey]!;
-        final date = DateFormat('EEEE, MMMM d, yyyy').format(dayEntries[0].loggedAt);
+        final date = DateFormat(
+          'EEEE, MMMM d, yyyy',
+        ).format(dayEntries[0].loggedAt);
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -48,13 +54,12 @@ class MoodJournalScreen extends ConsumerWidget {
               padding: const EdgeInsets.only(bottom: 8, left: 4),
               child: Text(
                 date,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
               ),
             ),
-            for (final entry in dayEntries)
-              _JournalEntryCard(entry: entry),
+            for (final entry in dayEntries) _JournalEntryCard(entry: entry),
           ],
         );
       },
@@ -75,18 +80,12 @@ class _JournalEntryCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: entry.mood.color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: entry.mood.color,
-          width: 2,
-        ),
+        border: Border.all(color: entry.mood.color, width: 2),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          MoodFace(
-            mood: entry.mood,
-            size: 40,
-          ),
+          MoodFace(mood: entry.mood, size: 40),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -94,9 +93,9 @@ class _JournalEntryCard extends StatelessWidget {
               children: [
                 Text(
                   entry.mood.label,
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
                 ),
                 if (entry.note != null && entry.note!.isNotEmpty) ...[
                   const SizedBox(height: 4),
@@ -108,9 +107,9 @@ class _JournalEntryCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   DateFormat.jm().format(entry.loggedAt),
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.black54,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: Colors.black54),
                 ),
               ],
             ),
