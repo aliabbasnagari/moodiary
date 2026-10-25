@@ -6,9 +6,6 @@ import '../models/mood.dart';
 import '../state/mood_entries_provider.dart';
 import 'mood_face.dart';
 
-/// Horizontal scrollable list of the user's most recent mood entries.
-///
-/// Tapping a card briefly animates that face — see [_TimelineCard].
 class MoodTimeline extends ConsumerWidget {
   const MoodTimeline({super.key});
 
@@ -17,27 +14,48 @@ class MoodTimeline extends ConsumerWidget {
     final entries = ref.watch(recentMoodEntriesProvider);
 
     if (entries.isEmpty) {
-      return SizedBox(
-        height: 160,
-        child: Center(
-          child: Text(
-            'No moods yet — tap a face above to log one.',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.black54,
-                ),
-          ),
-        ),
-      );
+      return _EmptyState(context);
     }
 
     return SizedBox(
-      height: 180,
+      height: 220,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
         itemCount: entries.length,
         separatorBuilder: (_, _) => const SizedBox(width: 12),
         itemBuilder: (context, i) => _TimelineCard(entry: entries[i]),
+      ),
+    );
+  }
+
+  Widget _EmptyState(BuildContext context) {
+    return SizedBox(
+      height: 180,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.note_add_outlined,
+              size: 48,
+              color: Colors.black26,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'No moods yet',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: Colors.black54,
+                  ),
+            ),
+            Text(
+              'Tap a face above to log one',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Colors.black45,
+                  ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -56,8 +74,10 @@ class _TimelineCardState extends State<_TimelineCard>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 900),
+    duration: const Duration(milliseconds: 500),
   );
+
+  final Duration _animationDuration = const Duration(milliseconds: 500);
 
   @override
   void dispose() {
@@ -80,62 +100,108 @@ class _TimelineCardState extends State<_TimelineCard>
       child: AnimatedBuilder(
         animation: _controller,
         builder: (context, child) {
-          // Card bounces gently and the face plays its expression beat.
           final t = _controller.value;
-          final wobble = t == 0
-              ? 0.0
-              : (1 - (2 * t - 1) * (2 * t - 1));
-          final scale = 1 + 0.06 * wobble;
+          final wobble = t == 0 ? 0.0 : (1 - (2 * t - 1) * (2 * t - 1));
+          final scale = 1 + 0.08 * wobble;
+          final translateY = -10 * wobble;
 
           return Transform.scale(
             scale: scale,
-            child: Container(
-              width: 140,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: entry.mood.color.withValues(alpha: 0.18),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: entry.mood.color,
-                  width: 2,
-                ),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  MoodFace(
-                    mood: entry.mood,
-                    size: 80,
-                    animation: _controller.value,
-                  ),
-                  Column(
-                    children: [
-                      Text(
-                        dateLabel,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
-                      ),
-                      Text(
-                        timeLabel,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Colors.black54,
-                            ),
-                      ),
-                      if (entry.note != null && entry.note!.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 4),
-                          child: Text(
-                            entry.note!,
-                            style: Theme.of(context).textTheme.bodySmall,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
+            child: Transform.translate(
+              offset: Offset(0, translateY),
+              child: Container(
+                width: 160,
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      entry.mood.color.withValues(alpha: 0.15),
+                      entry.mood.color.withValues(alpha: 0.05),
                     ],
                   ),
-                ],
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: entry.mood.color.withValues(alpha: 0.15),
+                      blurRadius: 8,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    MoodFace(
+                      mood: entry.mood,
+                      size: 88,
+                      animation: _controller.value,
+                    ),
+                    Column(
+                      children: [
+                        if (entry.note != null && entry.note!.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 6),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.05),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                entry.note!,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(
+                                      color: Colors.black87,
+                                    ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: entry.mood.color.withValues(alpha: 0.2),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                dateLabel,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelSmall
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                      color: entry.mood.color,
+                                    ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          timeLabel,
+                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                color: Colors.black54,
+                              ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           );
@@ -154,4 +220,3 @@ class _TimelineCardState extends State<_TimelineCard>
     return DateFormat('EEE, MMM d').format(when);
   }
 }
-
