@@ -83,3 +83,8 @@ final recentTrendsProvider = Provider<MoodTrends>((ref) {
   final entries = ref.watch(recentMoodEntriesProvider);
   return MoodTrends.fromEntries(entries);
 });
+
+final journalEntriesProvider = Provider<List<MoodEntry>>((ref) {
+  final entries = ref.watch(moodEntriesProvider);
+  return entries.toList();
+});

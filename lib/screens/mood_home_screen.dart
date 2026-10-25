@@ -4,6 +4,7 @@ import '../models/mood.dart';
 import '../widgets/mood_picker.dart';
 import '../widgets/mood_timeline.dart';
 import '../widgets/mood_trends_chart.dart';
+import 'mood_journal_screen.dart';
 
 class MoodHomeScreen extends StatefulWidget {
   const MoodHomeScreen({super.key});
@@ -15,7 +16,7 @@ class MoodHomeScreen extends StatefulWidget {
 class _MoodHomeScreenState extends State<MoodHomeScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController = TabController(
-    length: 2,
+    length: 3,
     vsync: this,
   );
 
@@ -38,7 +39,8 @@ class _MoodHomeScreenState extends State<MoodHomeScreen>
           controller: _tabController,
           tabs: const [
             Tab(text: 'Log'),
-            Tab(text: 'Trends'),
+            Tab(text: 'Timeline'),
+            Tab(text: 'Journal'),
           ],
         ),
       ),
@@ -52,7 +54,8 @@ class _MoodHomeScreenState extends State<MoodHomeScreen>
                 controller: _tabController,
                 children: [
                   _buildLogTab(),
-                  const MoodTrendsChart(),
+                  const MoodTimeline(),
+                  const MoodJournalScreen(),
                 ],
               ),
             ),

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../models/mood.dart';
+import '../state/mood_entries_provider.dart';
 import '../state/mood_trends_provider.dart';
 
 class MoodTrendsChart extends ConsumerWidget {
@@ -11,7 +12,7 @@ class MoodTrendsChart extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final trends = ref.watch(moodTrendsProvider);
+    final trends = ref.watch(recentTrendsProvider);
 
     if (trends.totalEntries == 0) {
       return _EmptyState();
