@@ -31,7 +31,7 @@ class MoodTimeline extends ConsumerWidget {
 
   Widget _EmptyState(BuildContext context) {
     return SizedBox(
-      height: 180,
+      height: 160,
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -77,8 +77,6 @@ class _TimelineCardState extends State<_TimelineCard>
     duration: const Duration(milliseconds: 500),
   );
 
-  final Duration _animationDuration = const Duration(milliseconds: 500);
-
   @override
   void dispose() {
     _controller.dispose();
@@ -110,8 +108,8 @@ class _TimelineCardState extends State<_TimelineCard>
             child: Transform.translate(
               offset: Offset(0, translateY),
               child: Container(
-                width: 160,
-                padding: const EdgeInsets.all(14),
+                width: 160.0,
+                padding: const EdgeInsets.all(14.0),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
@@ -136,7 +134,7 @@ class _TimelineCardState extends State<_TimelineCard>
                   children: [
                     MoodFace(
                       mood: entry.mood,
-                      size: 88,
+                      size: 88.0,
                       animation: _controller.value,
                     ),
                     Column(

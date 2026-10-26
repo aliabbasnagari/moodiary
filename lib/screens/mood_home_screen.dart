@@ -54,7 +54,7 @@ class _MoodHomeScreenState extends State<MoodHomeScreen>
                 controller: _tabController,
                 children: [
                   _buildLogTab(),
-                  const MoodTimeline(),
+                  _buildTimelineTab(),
                   const MoodJournalScreen(),
                 ],
               ),
@@ -92,5 +92,9 @@ class _MoodHomeScreenState extends State<MoodHomeScreen>
         const MoodTimeline(),
       ],
     );
+  }
+
+  Widget _buildTimelineTab() {
+    return const Center(child: MoodTimeline());
   }
 }
