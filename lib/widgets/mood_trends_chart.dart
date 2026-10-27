@@ -7,12 +7,23 @@ import '../models/mood.dart';
 import '../state/mood_entries_provider.dart';
 import '../state/mood_trends_provider.dart';
 
+final dayOfWeekNames = {
+  '1': 'Mon',
+  '2': 'Tue',
+  '3': 'Wed',
+  '4': 'Thu',
+  '5': 'Fri',
+  '6': 'Sat',
+  '7': 'Sun',
+};
+
 class MoodTrendsChart extends ConsumerWidget {
   const MoodTrendsChart({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final trends = ref.watch(recentTrendsProvider);
+    final dayOfWeekTrends = ref.watch(dayOfWeekTrendsProvider);
 
     if (trends.totalEntries == 0) {
       return _EmptyState();
@@ -23,7 +34,11 @@ class MoodTrendsChart extends ConsumerWidget {
       children: [
         _SummarySection(trends: trends),
         const SizedBox(height: 16),
+        _StreakSection(trends: trends),
+        const SizedBox(height: 16),
         _DistributionChart(trends: trends),
+        const SizedBox(height: 16),
+        _DayOfWeekChart(trends: trends, dayOfWeekTrends: dayOfWeekTrends),
         const SizedBox(height: 16),
         _RecentActivity(trends: trends),
       ],
@@ -251,5 +266,78 @@ class _RecentActivity extends StatelessWidget {
     final day = int.parse(parts[2]);
     final date = DateTime(year, month, day);
     return DateFormat('EEE, MMM d').format(date);
+  }
+}
+
+class _StreakSection extends StatelessWidget {
+  final MoodTrends trends;
+
+  const _StreakSection({required this.trends});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: trends.currentStreak > 1
+                  ? Color(0xFFFFC857).withValues(alpha: 0.1)
+                  : Colors.orange.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: trends.currentStreak > 1
+                    ? Color(0xFFFFC857)
+                    : Colors.orange,
+                width: 2,
+              ),
+            ),
+            child: Column(
+              children: [
+                Text(
+                  '${trends.currentStreak}',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                ),
+                Text(
+                  trends.currentStreak == 1 ? 'Day streak' : 'Day streak',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.purple.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Colors.purple,
+                width: 2,
+              ),
+            ),
+            child: Column(
+              children: [
+                Text(
+                  '${trends.longestStreak}',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                ),
+                Text(
+                  'Best streak',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
