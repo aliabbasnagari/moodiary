@@ -9,8 +9,8 @@ import '../models/mood.dart';
 class MoodEntriesNotifier extends StateNotifier<List<MoodEntry>> {
   MoodEntriesNotifier() : super(const []);
 
-  void log(Mood mood, String? note) {
-    final entry = MoodEntry(mood: mood, loggedAt: DateTime.now(), note: note);
+  void log(Mood mood, String? note, String? promptResponse) {
+    final entry = MoodEntry(mood: mood, loggedAt: DateTime.now(), note: note, promptResponse: promptResponse);
     // Newest first — that's how the timeline reads.
     state = [entry, ...state];
   }

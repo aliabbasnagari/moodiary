@@ -19,17 +19,19 @@ enum Mood {
 
 /// A single mood log entry.
 class MoodEntry {
-  const MoodEntry({required this.mood, required this.loggedAt, this.note});
+  const MoodEntry({required this.mood, required this.loggedAt, this.note, this.promptResponse});
 
   final Mood mood;
   final DateTime loggedAt;
   final String? note;
+  final String? promptResponse;
 
   MoodEntry copyWith({DateTime? loggedAt}) {
     return MoodEntry(
       mood: mood,
       loggedAt: loggedAt ?? this.loggedAt,
       note: note,
+      promptResponse: promptResponse,
     );
   }
 }
