@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/mood.dart';
+import '../models/trigger.dart';
 import 'mood_entries_provider.dart';
 
 final dayOfWeekNames = {
@@ -23,6 +24,8 @@ class MoodTrends {
   final int currentStreak;
   final int longestStreak;
   final Map<String, int> countsByDayOfWeek;
+  final Map<Trigger, int> countsByTrigger;
+  final Trigger? topTrigger;
 
   const MoodTrends({
     required this.totalEntries,
@@ -33,6 +36,8 @@ class MoodTrends {
     required this.currentStreak,
     required this.longestStreak,
     required this.countsByDayOfWeek,
+    this.countsByTrigger = const {},
+    this.topTrigger,
   });
 
   factory MoodTrends.fromEntries(List<MoodEntry> entries) {
@@ -98,7 +103,7 @@ class MoodTrends {
     }
     final sortedDays = uniqueDays.toList()
       ..sort((a, b) => b.compareTo(a));
-    
+
     if (sortedDays.isNotEmpty) {
       final todayKey = '${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}';
       if (uniqueDays.contains(todayKey)) {
@@ -113,7 +118,7 @@ class MoodTrends {
           }
         }
       }
-      
+
       int streak = 0;
       for (int i = 0; i < 365; i++) {
         final date = DateTime.now().subtract(Duration(days: i));
@@ -132,6 +137,22 @@ class MoodTrends {
       }
     }
 
+    // Trigger breakdown
+    final triggerMap = <Trigger, int>{};
+    for (final entry in entries) {
+      for (final trigger in entry.triggers) {
+        triggerMap.update(trigger, (value) => value! + 1, ifAbsent: () => 1);
+      }
+    }
+    Trigger? topTrigger;
+    int topCount = 0;
+    for (final entry in triggerMap.entries) {
+      if (entry.value > topCount) {
+        topCount = entry.value;
+        topTrigger = entry.key;
+      }
+    }
+
     return MoodTrends(
       totalEntries: entries.length,
       countsByMood: countsByMood,
@@ -141,6 +162,8 @@ class MoodTrends {
       currentStreak: currentStreak,
       longestStreak: longestStreak,
       countsByDayOfWeek: dayOfWeekMap,
+      countsByTrigger: triggerMap,
+      topTrigger: topTrigger,
     );
   }
 }

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../models/mood.dart';
+import '../models/trigger.dart';
 import '../state/mood_entries_provider.dart';
 import '../state/mood_trends_provider.dart';
 
@@ -37,6 +38,8 @@ class MoodTrendsChart extends ConsumerWidget {
         _StreakSection(trends: trends),
         const SizedBox(height: 16),
         _DistributionChart(trends: trends),
+        const SizedBox(height: 16),
+        _TriggerBreakdown(trends: trends),
         const SizedBox(height: 16),
         _DayOfWeekChart(trends: trends, dayOfWeekTrends: dayOfWeekTrends),
         const SizedBox(height: 16),
@@ -202,6 +205,82 @@ class _DistributionChart extends StatelessWidget {
             );
           }).toList(),
         ),
+      ],
+    );
+  }
+}
+
+class _TriggerBreakdown extends StatelessWidget {
+  final MoodTrends trends;
+
+  const _TriggerBreakdown({required this.trends});
+
+  @override
+  Widget build(BuildContext context) {
+    if (trends.countsByTrigger.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final sorted = trends.countsByTrigger.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    final maxCount = sorted.first.value;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Mood Triggers',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'What shows up most in your logs',
+          style: Theme.of(context).textTheme.bodySmall
+              ?.copyWith(color: Colors.black54),
+        ),
+        const SizedBox(height: 12),
+        ...sorted.map((entry) {
+          final count = entry.value;
+          final widthPct = count / maxCount;
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(entry.key.icon, size: 16, color: entry.key.color),
+                    const SizedBox(width: 6),
+                    Text(
+                      entry.key.label,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                    const Spacer(),
+                    Text(
+                      '$count',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    value: widthPct,
+                    minHeight: 8,
+                    backgroundColor:
+                        entry.key.color.withValues(alpha: 0.1),
+                    valueColor: AlwaysStoppedAnimation(entry.key.color),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }),
       ],
     );
   }

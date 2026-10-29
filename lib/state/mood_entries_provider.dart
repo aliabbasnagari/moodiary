@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/mood.dart';
+import '../models/trigger.dart';
 
 /// Holds the user's logged moods.
 ///
@@ -9,8 +10,19 @@ import '../models/mood.dart';
 class MoodEntriesNotifier extends StateNotifier<List<MoodEntry>> {
   MoodEntriesNotifier() : super(const []);
 
-  void log(Mood mood, String? note, String? promptResponse) {
-    final entry = MoodEntry(mood: mood, loggedAt: DateTime.now(), note: note, promptResponse: promptResponse);
+  void log(
+    Mood mood,
+    String? note, {
+    String? promptResponse,
+    List<Trigger> triggers = const [],
+  }) {
+    final entry = MoodEntry(
+      mood: mood,
+      loggedAt: DateTime.now(),
+      note: note,
+      promptResponse: promptResponse,
+      triggers: triggers,
+    );
     // Newest first — that's how the timeline reads.
     state = [entry, ...state];
   }

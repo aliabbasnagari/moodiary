@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../models/mood.dart';
+import '../models/trigger.dart';
 import '../state/mood_entries_provider.dart';
 import 'mood_face.dart';
 
@@ -139,6 +140,50 @@ class _TimelineCardState extends State<_TimelineCard>
                     ),
                     Column(
                       children: [
+                        if (entry.triggers.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 6),
+                            child: Wrap(
+                              spacing: 4,
+                              runSpacing: 4,
+                              alignment: WrapAlignment.center,
+                              children: [
+                                for (final trigger in entry.triggers)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 6,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          trigger.color.withValues(alpha: 0.12),
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          trigger.icon,
+                                          size: 11,
+                                          color: trigger.color,
+                                        ),
+                                        const SizedBox(width: 3),
+                                        Text(
+                                          trigger.label,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .labelSmall
+                                              ?.copyWith(
+                                                color: Colors.black87,
+                                                fontSize: 10,
+                                              ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
                         if (entry.note != null && entry.note!.isNotEmpty)
                           Padding(
                             padding: const EdgeInsets.only(bottom: 6),

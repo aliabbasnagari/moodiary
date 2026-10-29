@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/mood.dart';
+import '../models/trigger.dart';
 import '../state/mood_entries_provider.dart';
 import '../state/mood_prompts_provider.dart';
 import 'mood_face.dart';
@@ -41,9 +42,9 @@ class MoodPicker extends ConsumerWidget {
   ) async {
     final moodCategory = _toMoodCategory(mood);
     final prompts = promptsByMood[moodCategory] ?? [];
-    
+
     if (prompts.isEmpty) {
-      _showNoteDialog(context, ref, mood, null);
+      _showNoteDialog(context, ref, mood, null, const []);
       return;
     }
 
@@ -56,32 +57,40 @@ class MoodPicker extends ConsumerWidget {
     );
 
     if (selectedPrompt != null) {
-      final noteAndResponse = await showDialog<_NoteAndResponse?>(
+      final selectedTriggers = await showDialog<List<Trigger>>(
         context: context,
-        builder: (context) => _NoteAndResponseDialog(
-          mood: mood,
-          prompt: selectedPrompt,
-        ),
+        builder: (context) => _TriggerPickerDialog(mood: mood),
       );
 
-      if (noteAndResponse != null) {
-        ref.read(moodEntriesProvider.notifier).log(
-              mood,
-              noteAndResponse.note,
-              noteAndResponse.response,
-            );
-        ScaffoldMessenger.of(context)
-          ..hideCurrentSnackBar()
-          ..showSnackBar(
-            SnackBar(
-              duration: const Duration(milliseconds: 1200),
-              backgroundColor: mood.color,
-              content: Text(
-                'Logged: ${mood.label}',
-                style: const TextStyle(color: Colors.black87),
+      if (selectedTriggers != null) {
+        final noteAndResponse = await showDialog<_NoteAndResponse?>(
+          context: context,
+          builder: (context) => _NoteAndResponseDialog(
+            mood: mood,
+            prompt: selectedPrompt,
+          ),
+        );
+
+        if (noteAndResponse != null) {
+          ref.read(moodEntriesProvider.notifier).log(
+                mood,
+                noteAndResponse.note,
+                promptResponse: noteAndResponse.response,
+                triggers: selectedTriggers,
+              );
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              SnackBar(
+                duration: const Duration(milliseconds: 1200),
+                backgroundColor: mood.color,
+                content: Text(
+                  'Logged: ${mood.label}',
+                  style: const TextStyle(color: Colors.black87),
+                ),
               ),
-            ),
-          );
+            );
+        }
       }
     }
   }
@@ -91,6 +100,7 @@ class MoodPicker extends ConsumerWidget {
     WidgetRef ref,
     Mood mood,
     String? promptResponse,
+    List<Trigger> triggers,
   ) async {
     final note = await showDialog<String?>(
       context: context,
@@ -98,7 +108,12 @@ class MoodPicker extends ConsumerWidget {
     );
 
     if (note != null) {
-      ref.read(moodEntriesProvider.notifier).log(mood, note, promptResponse);
+      ref.read(moodEntriesProvider.notifier).log(
+            mood,
+            note,
+            promptResponse: promptResponse,
+            triggers: triggers,
+          );
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(
@@ -221,6 +236,105 @@ class _PromptSelectorDialog extends StatelessWidget {
           child: const Text('No Prompt'),
         ),
       ],
+    );
+  }
+}
+
+class _TriggerPickerDialog extends StatefulWidget {
+  final Mood mood;
+
+  const _TriggerPickerDialog({required this.mood});
+
+  @override
+  State<_TriggerPickerDialog> createState() => _TriggerPickerDialogState();
+}
+
+class _TriggerPickerDialogState extends State<_TriggerPickerDialog> {
+  final Set<Trigger> _selected = <Trigger>{};
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('What affected your mood?'),
+      content: SizedBox(
+        width: 300,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Tap all that apply. You can skip this step.',
+              style: TextStyle(color: Colors.black54),
+            ),
+            const SizedBox(height: 16),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (final trigger in Trigger.values)
+                  _TriggerChip(
+                    trigger: trigger,
+                    selected: _selected.contains(trigger),
+                    onTap: () {
+                      setState(() {
+                        if (_selected.contains(trigger)) {
+                          _selected.remove(trigger);
+                        } else {
+                          _selected.add(trigger);
+                        }
+                      });
+                    },
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Skip'),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.pop(context, _selected.toList()),
+          child: Text(
+            _selected.isEmpty ? 'Continue' : 'Continue (${_selected.length})',
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _TriggerChip extends StatelessWidget {
+  final Trigger trigger;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _TriggerChip({
+    required this.trigger,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ActionChip(
+      avatar: Icon(
+        trigger.icon,
+        size: 16,
+        color: selected ? Colors.white : trigger.color,
+      ),
+      label: Text(trigger.label),
+      backgroundColor: selected ? trigger.color : trigger.color.withValues(alpha: 0.1),
+      side: Border.all(
+        color: trigger.color,
+        width: 1,
+      ),
+      labelStyle: TextStyle(
+        color: selected ? Colors.white : Colors.black87,
+        fontSize: 13,
+      ),
+      onPressed: onTap,
     );
   }
 }
