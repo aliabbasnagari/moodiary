@@ -1,11 +1,14 @@
 # Moodiary
 
-A simple, cheerful Flutter app for logging how you feel. Tap a face to record your mood and watch your recent entries appear in a horizontal timeline.
+A simple, cheerful Flutter app for logging how you feel. Tap a face to record your mood, answer a quick reflection prompt, tag what triggered it — and watch your patterns emerge in the journal and trends views.
 
 ## Features
 
 - Five expressive moods — Happy, Good, Neutral, Sad, Awful — each rendered with a custom `CustomPainter` face (no image assets required).
-- One-tap mood logging with an instant confirmation snackbar.
+- Mood logging flow: pick a mood, optionally answer a mindfulness prompt, tag mood triggers, and add a note — with an instant confirmation snackbar.
+- **Mood triggers** — tag entries with life factors (sleep, exercise, weather, work, people, and more) and see which ones show up most in your logs.
+- **Trends & insights** — most common mood, happiness score, logging streaks, mood distribution, day-of-week patterns, and a trigger breakdown.
+- **Journal** — all entries grouped by day, each card showing the mood face, label, note, and time.
 - Horizontal timeline of recent moods, color-coded by feeling and timestamped with `intl`.
 - State managed with [Riverpod](https://pub.dev/packages/flutter_riverpod) (`ProviderScope` + `StateNotifier`).
 - Material 3 theme with a warm, paper-like background.
@@ -23,16 +26,21 @@ A simple, cheerful Flutter app for logging how you feel. Tap a face to record yo
 lib/
 ├── main.dart                      # App entry point, theme, ProviderScope
 ├── models/
-│   └── mood.dart                  # Mood enum + MoodEntry model
+│   ├── mood.dart                  # Mood enum + MoodEntry model
+│   └── trigger.dart               # Trigger enum (mood trigger categories)
 ├── state/
-│   └── mood_entries_provider.dart # Riverpod StateNotifier for entries
+│   ├── mood_entries_provider.dart # Riverpod StateNotifier for entries
+│   ├── mood_prompts_provider.dart # Reflection prompts per mood + weekly prompt
+│   └── mood_trends_provider.dart  # Computed trends (distribution, streaks, triggers)
 ├── screens/
-│   └── mood_home_screen.dart      # Main screen layout
+│   ├── mood_home_screen.dart      # Tabbed main screen (Log / Timeline / Journal)
+│   └── mood_journal_screen.dart   # Journal tab — entries grouped by day
 └── widgets/
     ├── mood_face.dart             # Reusable mood face widget
     ├── mood_face_painter.dart     # CustomPainter that draws each face
-    ├── mood_picker.dart           # Row of tappable mood faces
-    └── mood_timeline.dart         # Horizontal list of recent entries
+    ├── mood_picker.dart           # Mood faces + prompt/trigger/note dialog flow
+    ├── mood_timeline.dart         # Horizontal list of recent entries
+    └── mood_trends_chart.dart     # Trends: summary, streaks, distribution, triggers
 ```
 
 ## Getting started
@@ -57,6 +65,12 @@ flutter run -d windows    # Windows desktop
 flutter run -d macos      # macOS desktop
 ```
 
+Run the test suite:
+
+```bash
+flutter test
+```
+
 ## Generating launcher icons
 
 App icons are configured via [`flutter_launcher_icons`](https://pub.dev/packages/flutter_launcher_icons) using `assets/icon/moodiary.webp`. To regenerate:
@@ -67,9 +81,10 @@ flutter pub run flutter_launcher_icons
 
 ## Tech stack
 
-- **Flutter** + **Material**
+- **Flutter** + **Material 3**
 - **flutter_riverpod** for state management
 - **intl** for date/time formatting
+- **collection** for trend calculations
 - **CustomPainter** for the mood faces
 
 ## Building for iOS
