@@ -326,7 +326,7 @@ class _TriggerChip extends StatelessWidget {
       ),
       label: Text(trigger.label),
       backgroundColor: selected ? trigger.color : trigger.color.withValues(alpha: 0.1),
-      side: Border.all(
+      side: BorderSide(
         color: trigger.color,
         width: 1,
       ),

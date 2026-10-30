@@ -348,6 +348,65 @@ class _RecentActivity extends StatelessWidget {
   }
 }
 
+class _DayOfWeekChart extends StatelessWidget {
+  final MoodTrends trends;
+  final Map<String, int> dayOfWeekTrends;
+
+  const _DayOfWeekChart({
+    required this.trends,
+    required this.dayOfWeekTrends,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final days = ['1', '2', '3', '4', '5', '6', '7'];
+    final maxCount = dayOfWeekTrends.values.fold<int>(0, (a, b) => a > b ? a : b);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Mood by day of week',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            for (final day in days)
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '${dayOfWeekTrends[day] ?? 0}',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                    const SizedBox(height: 4),
+                    Container(
+                      height: ((dayOfWeekTrends[day] ?? 0) / (maxCount == 0 ? 1 : maxCount)) * 60,
+                      decoration: BoxDecoration(
+                        color: Color(0xFF8AC926).withValues(alpha: 0.7),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      dayOfWeekNames[day]!,
+                      style: Theme.of(context).textTheme.labelSmall,
+                    ),
+                  ],
+                ),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
 class _StreakSection extends StatelessWidget {
   final MoodTrends trends;
 
