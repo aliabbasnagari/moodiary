@@ -9,16 +9,17 @@ import '../state/mood_entries_provider.dart';
 ///
 /// Lets the user change the mood, note, and triggers. The original
 /// prompt response is preserved and shown read-only.
-class MoodEntryEditDialog extends StatefulWidget {
+class MoodEntryEditDialog extends ConsumerStatefulWidget {
   final MoodEntry entry;
 
   const MoodEntryEditDialog({super.key, required this.entry});
 
   @override
-  State<MoodEntryEditDialog> createState() => _MoodEntryEditDialogState();
+  ConsumerState<MoodEntryEditDialog> createState() =>
+      _MoodEntryEditDialogState();
 }
 
-class _MoodEntryEditDialogState extends State<MoodEntryEditDialog> {
+class _MoodEntryEditDialogState extends ConsumerState<MoodEntryEditDialog> {
   late Mood _selectedMood;
   late Set<Trigger> _selectedTriggers;
   late final TextEditingController _noteController;
@@ -103,7 +104,6 @@ class _MoodEntryEditDialogState extends State<MoodEntryEditDialog> {
                             : trigger.color,
                       ),
                       label: Text(trigger.label),
-                      selected: _selectedTriggers.contains(trigger),
                       backgroundColor: _selectedTriggers.contains(trigger)
                           ? trigger.color
                           : trigger.color.withValues(alpha: 0.1),
@@ -151,9 +151,7 @@ class _MoodEntryEditDialogState extends State<MoodEntryEditDialog> {
               note: _noteController.text.isEmpty ? null : _noteController.text,
               triggers: _selectedTriggers.toList(),
             );
-            context
-                .read(moodEntriesProvider.notifier)
-                .updateEntry(updated);
+            ref.read(moodEntriesProvider.notifier).updateEntry(updated);
             Navigator.pop(context);
           },
           child: const Text('Save'),
