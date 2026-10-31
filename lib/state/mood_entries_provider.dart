@@ -27,6 +27,20 @@ class MoodEntriesNotifier extends StateNotifier<List<MoodEntry>> {
     state = [entry, ...state];
   }
 
+  void updateEntry(MoodEntry updated) {
+    state = [
+      for (final entry in state)
+        if (entry.id == updated.id) updated else entry,
+    ];
+  }
+
+  void removeEntry(String id) {
+    state = [
+      for (final entry in state)
+        if (entry.id != id) entry,
+    ];
+  }
+
   void clear() => state = const [];
 }
 

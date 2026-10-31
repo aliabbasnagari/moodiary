@@ -21,27 +21,41 @@ enum Mood {
 
 /// A single mood log entry.
 class MoodEntry {
-  const MoodEntry({
+  MoodEntry({
     required this.mood,
     required this.loggedAt,
     this.note,
     this.promptResponse,
     this.triggers = const [],
-  });
+  }) : id = _generateId();
 
+  final String id;
   final Mood mood;
   final DateTime loggedAt;
   final String? note;
   final String? promptResponse;
   final List<Trigger> triggers;
 
-  MoodEntry copyWith({DateTime? loggedAt}) {
+  static String _generateId() {
+    return DateTime.now().microsecondsSinceEpoch.toString();
+  }
+
+  MoodEntry copyWith({
+    Mood? mood,
+    DateTime? loggedAt,
+    String? note,
+    String? promptResponse,
+    List<Trigger>? triggers,
+    bool clearNote = false,
+    bool clearPromptResponse = false,
+  }) {
     return MoodEntry(
-      mood: mood,
+      mood: mood ?? this.mood,
       loggedAt: loggedAt ?? this.loggedAt,
-      note: note,
-      promptResponse: promptResponse,
-      triggers: triggers,
+      note: clearNote ? null : (note ?? this.note),
+      promptResponse:
+          clearPromptResponse ? null : (promptResponse ?? this.promptResponse),
+      triggers: triggers ?? this.triggers,
     );
   }
 }

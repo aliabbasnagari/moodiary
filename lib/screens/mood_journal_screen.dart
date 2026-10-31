@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../models/mood.dart';
 import '../state/mood_entries_provider.dart';
+import '../widgets/mood_entry_edit_dialog.dart';
 import '../widgets/mood_face.dart';
 
 class MoodJournalScreen extends ConsumerWidget {
@@ -67,13 +68,13 @@ class MoodJournalScreen extends ConsumerWidget {
   }
 }
 
-class _JournalEntryCard extends StatelessWidget {
+class _JournalEntryCard extends ConsumerWidget {
   final MoodEntry entry;
 
   const _JournalEntryCard({required this.entry});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -114,7 +115,87 @@ class _JournalEntryCard extends StatelessWidget {
               ],
             ),
           ),
+          const SizedBox(width: 8),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _CardActionButton(
+                icon: Icons.edit_outlined,
+                tooltip: 'Edit entry',
+                onTap: () {
+                  showDialog<void>(
+                    context: context,
+                    builder: (context) => MoodEntryEditDialog(entry: entry),
+                  );
+                },
+              ),
+              const SizedBox(height: 8),
+              _CardActionButton(
+                icon: Icons.delete_outline,
+                tooltip: 'Delete entry',
+                onTap: () => _confirmDelete(context, ref),
+              ),
+            ],
+          ),
         ],
+      ),
+    );
+  }
+
+  Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete entry?'),
+        content: const Text(
+          'This will remove the mood entry from your journal and timeline.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: Colors.red,
+            ),
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      ref.read(moodEntriesProvider.notifier).removeEntry(entry.id);
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(const SnackBar(
+          content: Text('Entry deleted'),
+          duration: Duration(milliseconds: 1200),
+        ));
+    }
+  }
+}
+
+class _CardActionButton extends StatelessWidget {
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback onTap;
+
+  const _CardActionButton({
+    required this.icon,
+    required this.tooltip,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(8),
+        onTap: onTap,
+        child: Icon(icon, size: 18, color: Colors.black54),
       ),
     );
   }

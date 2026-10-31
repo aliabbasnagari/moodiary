@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../models/mood.dart';
 import '../models/trigger.dart';
 import '../state/mood_entries_provider.dart';
+import 'mood_entry_edit_dialog.dart';
 import 'mood_face.dart';
 
 class MoodTimeline extends ConsumerWidget {
@@ -62,16 +63,16 @@ class MoodTimeline extends ConsumerWidget {
   }
 }
 
-class _TimelineCard extends StatefulWidget {
+class _TimelineCard extends ConsumerStatefulWidget {
   const _TimelineCard({required this.entry});
 
   final MoodEntry entry;
 
   @override
-  State<_TimelineCard> createState() => _TimelineCardState();
+  ConsumerState<_TimelineCard> createState() => _TimelineCardState();
 }
 
-class _TimelineCardState extends State<_TimelineCard>
+class _TimelineCardState extends ConsumerState<_TimelineCard>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
@@ -241,6 +242,23 @@ class _TimelineCardState extends State<_TimelineCard>
                                 color: Colors.black54,
                               ),
                         ),
+                        const SizedBox(height: 6),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _CardActionIcon(
+                              icon: Icons.edit_outlined,
+                              tooltip: 'Edit entry',
+                              onTap: () => _showEditDialog(context),
+                            ),
+                            const SizedBox(width: 8),
+                            _CardActionIcon(
+                              icon: Icons.delete_outline,
+                              tooltip: 'Delete entry',
+                              onTap: () => _confirmDelete(context),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ],
@@ -253,6 +271,47 @@ class _TimelineCardState extends State<_TimelineCard>
     );
   }
 
+  void _showEditDialog(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      builder: (context) => MoodEntryEditDialog(entry: widget.entry),
+    );
+  }
+
+  Future<void> _confirmDelete(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete entry?'),
+        content: const Text(
+          'This will remove the mood entry from your journal and timeline.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: Colors.red,
+            ),
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true && mounted) {
+      ref.read(moodEntriesProvider.notifier).removeEntry(widget.entry.id);
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(const SnackBar(
+          content: Text('Entry deleted'),
+          duration: Duration(milliseconds: 1200),
+        ));
+    }
+  }
+
   String _formatDate(DateTime when) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -261,5 +320,29 @@ class _TimelineCardState extends State<_TimelineCard>
     if (diff == 0) return 'Today';
     if (diff == 1) return 'Yesterday';
     return DateFormat('EEE, MMM d').format(when);
+  }
+}
+
+class _CardActionIcon extends StatelessWidget {
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback onTap;
+
+  const _CardActionIcon({
+    required this.icon,
+    required this.tooltip,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(8),
+        onTap: onTap,
+        child: Icon(icon, size: 16, color: Colors.black54),
+      ),
+    );
   }
 }
