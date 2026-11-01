@@ -21,6 +21,7 @@ enum Mood {
 
 /// A single mood log entry.
 class MoodEntry {
+  /// Creates a brand-new entry with a generated id.
   MoodEntry({
     required this.mood,
     required this.loggedAt,
@@ -28,6 +29,34 @@ class MoodEntry {
     this.promptResponse,
     this.triggers = const [],
   }) : id = _generateId();
+
+  const MoodEntry._({
+    required this.id,
+    required this.mood,
+    required this.loggedAt,
+    required this.note,
+    required this.promptResponse,
+    required this.triggers,
+  });
+
+  /// Restores an entry from persistence, keeping its original id.
+  factory MoodEntry.restore({
+    required String id,
+    required Mood mood,
+    required DateTime loggedAt,
+    String? note,
+    String? promptResponse,
+    List<Trigger> triggers = const [],
+  }) {
+    return MoodEntry._(
+      id: id,
+      mood: mood,
+      loggedAt: loggedAt,
+      note: note,
+      promptResponse: promptResponse,
+      triggers: triggers,
+    );
+  }
 
   final String id;
   final Mood mood;
@@ -49,7 +78,8 @@ class MoodEntry {
     bool clearNote = false,
     bool clearPromptResponse = false,
   }) {
-    return MoodEntry(
+    return MoodEntry._(
+      id: id,
       mood: mood ?? this.mood,
       loggedAt: loggedAt ?? this.loggedAt,
       note: clearNote ? null : (note ?? this.note),
