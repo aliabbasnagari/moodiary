@@ -6,6 +6,7 @@ import '../models/mood.dart';
 import '../state/mood_entries_provider.dart';
 import '../widgets/mood_entry_edit_dialog.dart';
 import '../widgets/mood_face.dart';
+import '../widgets/weekly_recap_card.dart';
 
 class MoodJournalScreen extends ConsumerWidget {
   const MoodJournalScreen({super.key});
@@ -38,32 +39,45 @@ class MoodJournalScreen extends ConsumerWidget {
     final sortedDays = groupedEntries.keys.toList()
       ..sort((a, b) => b.compareTo(a));
 
-    return ListView.builder(
+    return CustomScrollView(
       padding: const EdgeInsets.all(16),
-      itemCount: sortedDays.length,
-      itemBuilder: (context, i) {
-        final dayKey = sortedDays[i];
-        final dayEntries = groupedEntries[dayKey]!;
-        final date = DateFormat(
-          'EEEE, MMMM d, yyyy',
-        ).format(dayEntries[0].loggedAt);
+      slivers: [
+        // Weekly recap pinned at the top (only shown when the week has data).
+        const SliverToBoxAdapter(child: WeeklyRecapCard()),
+        SliverPadding(
+          padding: const EdgeInsets.only(top: 16),
+          sliver: SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, i) {
+                final dayKey = sortedDays[i];
+                final dayEntries = groupedEntries[dayKey]!;
+                final date = DateFormat(
+                  'EEEE, MMMM d, yyyy',
+                ).format(dayEntries[0].loggedAt);
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8, left: 4),
-              child: Text(
-                date,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
-              ),
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8, left: 4),
+                      child: Text(
+                        date,
+                        style: Theme.of(
+                          context,
+                        ).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    for (final entry in dayEntries)
+                      _JournalEntryCard(entry: entry),
+                  ],
+                );
+              },
+              childCount: sortedDays.length,
             ),
-            for (final entry in dayEntries) _JournalEntryCard(entry: entry),
-          ],
-        );
-      },
+          ),
+        ),
+      ],
     );
   }
 }

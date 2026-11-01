@@ -9,6 +9,8 @@ A simple, cheerful Flutter app for logging how you feel. Tap a face to record yo
 - **Mood triggers** — tag entries with life factors (sleep, exercise, weather, work, people, and more) and see which ones show up most in your logs.
 - **Trends & insights** — most common mood, happiness score, logging streaks, mood distribution, day-of-week patterns, and a trigger breakdown.
 - **Journal** — all entries grouped by day, each card showing the mood face, label, note, and time.
+- **Weekly recap** — a "Your Week at a Glance" card summarizing the last 7 days (dominant mood, happiness, top trigger, mood mix, best/hardest day) that you can copy or share as text.
+- **Local persistence** — entries, notes, and triggers are saved with `shared_preferences`, so your history survives app restarts.
 - Horizontal timeline of recent moods, color-coded by feeling and timestamped with `intl`.
 - State managed with [Riverpod](https://pub.dev/packages/flutter_riverpod) (`ProviderScope` + `StateNotifier`).
 - Material 3 theme with a warm, paper-like background.
@@ -27,20 +29,24 @@ lib/
 ├── main.dart                      # App entry point, theme, ProviderScope
 ├── models/
 │   ├── mood.dart                  # Mood enum + MoodEntry model
-│   └── trigger.dart               # Trigger enum (mood trigger categories)
+│   ├── trigger.dart               # Trigger enum (mood trigger categories)
+│   └── mood_entry_serializers.dart# JSON encode/decode for persistence
 ├── state/
-│   ├── mood_entries_provider.dart # Riverpod StateNotifier for entries
+│   ├── mood_entries_provider.dart # Riverpod StateNotifier for entries (+ persistence)
 │   ├── mood_prompts_provider.dart # Reflection prompts per mood + weekly prompt
-│   └── mood_trends_provider.dart  # Computed trends (distribution, streaks, triggers)
+│   ├── mood_trends_provider.dart  # Computed trends (distribution, streaks, triggers)
+│   └── weekly_recap_provider.dart # 7-day recap: dominant mood, top trigger, best/worst day
 ├── screens/
 │   ├── mood_home_screen.dart      # Tabbed main screen (Log / Timeline / Journal)
-│   └── mood_journal_screen.dart   # Journal tab — entries grouped by day
+│   └── mood_journal_screen.dart   # Journal tab — weekly recap + entries grouped by day
 └── widgets/
     ├── mood_face.dart             # Reusable mood face widget
     ├── mood_face_painter.dart     # CustomPainter that draws each face
     ├── mood_picker.dart           # Mood faces + prompt/trigger/note dialog flow
     ├── mood_timeline.dart         # Horizontal list of recent entries
-    └── mood_trends_chart.dart     # Trends: summary, streaks, distribution, triggers
+    ├── mood_trends_chart.dart     # Trends: summary, streaks, distribution, triggers
+    ├── mood_entry_edit_dialog.dart# Edit an existing entry (mood, note, triggers)
+    └── weekly_recap_card.dart     # "Your Week at a Glance" card with copy/share
 ```
 
 ## Getting started
@@ -85,6 +91,8 @@ flutter pub run flutter_launcher_icons
 - **flutter_riverpod** for state management
 - **intl** for date/time formatting
 - **collection** for trend calculations
+- **shared_preferences** for local persistence
+- **share_plus** for exporting the weekly recap
 - **CustomPainter** for the mood faces
 
 ## Building for iOS

@@ -119,4 +119,23 @@ void main() {
 
     expect(find.text('To be deleted'), findsNothing);
   });
+
+  testWidgets('shows weekly recap in the journal tab',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(const ProviderScope(child: MoodiaryApp()));
+    await tester.pumpAndSettle();
+
+    // Log a mood with a trigger so the recap has data to show.
+    await _logMood(tester, note: 'Recap test', withTrigger: true);
+
+    // Switch to the Journal tab.
+    await tester.tap(find.text('Journal'));
+    await tester.pumpAndSettle();
+
+    // The recap card should appear with the week summary.
+    expect(find.text('Your Week at a Glance'), findsOneWidget);
+    expect(find.textContaining('moods logged'), findsOneWidget);
+    // The trigger we tagged should surface in the recap.
+    expect(find.text('Most logged trigger: Sleep'), findsOneWidget);
+  });
 }
