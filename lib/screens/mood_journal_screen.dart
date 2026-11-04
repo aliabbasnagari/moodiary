@@ -40,12 +40,16 @@ class MoodJournalScreen extends ConsumerWidget {
       ..sort((a, b) => b.compareTo(a));
 
     return CustomScrollView(
-      padding: const EdgeInsets.all(16),
       slivers: [
         // Weekly recap pinned at the top (only shown when the week has data).
-        const SliverToBoxAdapter(child: WeeklyRecapCard()),
+        const SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: WeeklyRecapCard(),
+          ),
+        ),
         SliverPadding(
-          padding: const EdgeInsets.only(top: 16),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
           sliver: SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, i) {

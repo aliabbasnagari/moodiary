@@ -10,6 +10,8 @@ A simple, cheerful Flutter app for logging how you feel. Tap a face to record yo
 - **Trends & insights** — most common mood, happiness score, logging streaks, mood distribution, day-of-week patterns, and a trigger breakdown.
 - **Journal** — all entries grouped by day, each card showing the mood face, label, note, and time.
 - **Weekly recap** — a "Your Week at a Glance" card summarizing the last 7 days (dominant mood, happiness, top trigger, mood mix, best/hardest day) that you can copy or share as text.
+- **Mood forecast** — a "Today's forecast" gauge on the Log tab that predicts today's likely mood from recent momentum, your most common trigger, and time of day, with a plain-language reason and confidence level.
+- **Logging goals** — set a daily or weekly check-in target, track progress with a ring on the Log tab, and get a gentle, dismissable in-app nudge when you haven't logged today.
 - **Local persistence** — entries, notes, and triggers are saved with `shared_preferences`, so your history survives app restarts.
 - Horizontal timeline of recent moods, color-coded by feeling and timestamped with `intl`.
 - State managed with [Riverpod](https://pub.dev/packages/flutter_riverpod) (`ProviderScope` + `StateNotifier`).
@@ -30,12 +32,15 @@ lib/
 ├── models/
 │   ├── mood.dart                  # Mood enum + MoodEntry model
 │   ├── trigger.dart               # Trigger enum (mood trigger categories)
+│   ├── goal.dart                  # Logging goal (daily/weekly target)
 │   └── mood_entry_serializers.dart# JSON encode/decode for persistence
 ├── state/
 │   ├── mood_entries_provider.dart # Riverpod StateNotifier for entries (+ persistence)
 │   ├── mood_prompts_provider.dart # Reflection prompts per mood + weekly prompt
 │   ├── mood_trends_provider.dart  # Computed trends (distribution, streaks, triggers)
-│   └── weekly_recap_provider.dart # 7-day recap: dominant mood, top trigger, best/worst day
+│   ├── weekly_recap_provider.dart # 7-day recap: dominant mood, top trigger, best/worst day
+│   ├── mood_forecast_provider.dart# Today's mood forecast (momentum + triggers + time of day)
+│   └── goals_provider.dart        # Daily/weekly logging goal + nudge state (persisted)
 ├── screens/
 │   ├── mood_home_screen.dart      # Tabbed main screen (Log / Timeline / Journal)
 │   └── mood_journal_screen.dart   # Journal tab — weekly recap + entries grouped by day
@@ -46,7 +51,10 @@ lib/
     ├── mood_timeline.dart         # Horizontal list of recent entries
     ├── mood_trends_chart.dart     # Trends: summary, streaks, distribution, triggers
     ├── mood_entry_edit_dialog.dart# Edit an existing entry (mood, note, triggers)
-    └── weekly_recap_card.dart     # "Your Week at a Glance" card with copy/share
+    ├── weekly_recap_card.dart     # "Your Week at a Glance" card with copy/share
+    ├── mood_forecast_card.dart    # "Today's forecast" gauge with contributing factors
+    ├── goal_progress_card.dart    # Progress ring + goal settings dialog
+    └── mood_nudge_banner.dart     # Gentle in-app "log your mood" nudge
 ```
 
 ## Getting started

@@ -69,10 +69,10 @@ class WeeklyRecapCard extends ConsumerWidget {
               children: [
                 Icon(
                   dominant == Mood.happy || dominant == Mood.good
-                      ? Icons.emoji_emotions_outlined
+                      ? Icons.sentiment_satisfied_alt_outlined
                       : dominant == Mood.neutral
                           ? Icons.sentiment_neutral_outlined
-                          : Icons.emoji_emotions_undecorated_outlined,
+                          : Icons.sentiment_dissatisfied_outlined,
                   color: dominant.color,
                 ),
                 const SizedBox(width: 8),

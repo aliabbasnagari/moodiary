@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../models/mood.dart';
+import '../widgets/goal_progress_card.dart';
+import '../widgets/mood_forecast_card.dart';
+import '../widgets/mood_nudge_banner.dart';
 import '../widgets/mood_picker.dart';
 import '../widgets/mood_timeline.dart';
 import '../widgets/mood_trends_chart.dart';
@@ -70,6 +73,7 @@ class _MoodHomeScreenState extends State<MoodHomeScreen>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 16),
+        const MoodNudgeBanner(),
         Text(
           'How are you feeling?',
           style: Theme.of(context).textTheme.headlineSmall,
@@ -83,7 +87,10 @@ class _MoodHomeScreenState extends State<MoodHomeScreen>
         ),
         const SizedBox(height: 24),
         const MoodPicker(),
-        const SizedBox(height: 40),
+        const SizedBox(height: 24),
+        const GoalProgressCard(),
+        const MoodForecastCard(),
+        const SizedBox(height: 16),
         Text(
           'Recent moods',
           style: Theme.of(context).textTheme.titleMedium,

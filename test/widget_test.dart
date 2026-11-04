@@ -120,6 +120,34 @@ void main() {
     expect(find.text('To be deleted'), findsNothing);
   });
 
+  testWidgets('shows goal progress and nudge banner on the log tab',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(const ProviderScope(child: MoodiaryApp()));
+    await tester.pumpAndSettle();
+
+    // Before logging: the nudge banner is visible, goal is at 0 of 1.
+    expect(find.text('Thinking of you'), findsOneWidget);
+    expect(find.text('Daily goal'), findsOneWidget);
+
+    // Log a mood — the nudge should disappear and the goal should be met.
+    await _logMood(tester);
+    expect(find.text('Thinking of you'), findsNothing);
+    expect(find.text('Goal reached!'), findsOneWidget);
+  });
+
+  testWidgets('shows mood forecast on the log tab',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(const ProviderScope(child: MoodiaryApp()));
+    await tester.pumpAndSettle();
+
+    // Log a mood so the forecast has data to work with.
+    await _logMood(tester, note: 'Forecast test');
+
+    // The forecast card should now show a concrete label.
+    expect(find.text('Today\'s forecast'), findsOneWidget);
+    expect(find.text('Trending up'), findsOneWidget);
+  });
+
   testWidgets('shows weekly recap in the journal tab',
       (WidgetTester tester) async {
     await tester.pumpWidget(const ProviderScope(child: MoodiaryApp()));

@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/mood.dart';
 import '../models/mood_entry_serializers.dart';
 import '../models/trigger.dart';
+import 'goals_provider.dart';
 
 const _kEntriesKey = 'mood_entries_v1';
 
@@ -15,10 +16,11 @@ const _kEntriesKey = 'mood_entries_v1';
 /// and streaks survive app restarts. The in-memory list is the source of
 /// truth for the UI; writes are debounced before hitting storage.
 class MoodEntriesNotifier extends StateNotifier<List<MoodEntry>> {
-  MoodEntriesNotifier() : super(const []) {
+  MoodEntriesNotifier(this._ref) : super(const []) {
     load();
   }
 
+  final Ref _ref;
   SharedPreferences? _prefs;
   Timer? _saveTimer;
   bool _loading = true;
@@ -80,6 +82,7 @@ class MoodEntriesNotifier extends StateNotifier<List<MoodEntry>> {
     // Newest first — that's how the timeline reads.
     state = [entry, ...state];
     _scheduleSave();
+    _ref.read(goalsProvider.notifier).markLoggedToday();
   }
 
   void updateEntry(MoodEntry updated) {
@@ -106,7 +109,7 @@ class MoodEntriesNotifier extends StateNotifier<List<MoodEntry>> {
 
 final moodEntriesProvider =
     StateNotifierProvider<MoodEntriesNotifier, List<MoodEntry>>(
-  (ref) => MoodEntriesNotifier(),
+  (ref) => MoodEntriesNotifier(ref),
 );
 
 /// The most recent 7 entries, in newest-first order.
