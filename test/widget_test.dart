@@ -148,6 +148,26 @@ void main() {
     expect(find.text('Trending up'), findsOneWidget);
   });
 
+  testWidgets('shows trigger insights in the journal tab',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(const ProviderScope(child: MoodiaryApp()));
+    await tester.pumpAndSettle();
+
+    // Log 5 Happy moods with the Sleep trigger so the pattern is detectable.
+    for (int i = 0; i < 5; i++) {
+      await _logMood(tester, note: 'Recap $i', withTrigger: true);
+    }
+
+    // Switch to the Journal tab.
+    await tester.tap(find.text('Journal'));
+    await tester.pumpAndSettle();
+
+    // The insights card should surface the Sleep pattern.
+    expect(find.text('Your Patterns'), findsOneWidget);
+    expect(find.textContaining('Days with Sleep lift your mood'),
+        findsOneWidget);
+  });
+
   testWidgets('shows weekly recap in the journal tab',
       (WidgetTester tester) async {
     await tester.pumpWidget(const ProviderScope(child: MoodiaryApp()));

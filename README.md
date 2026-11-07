@@ -12,6 +12,7 @@ A simple, cheerful Flutter app for logging how you feel. Tap a face to record yo
 - **Weekly recap** — a "Your Week at a Glance" card summarizing the last 7 days (dominant mood, happiness, top trigger, mood mix, best/hardest day) that you can copy or share as text.
 - **Mood forecast** — a "Today's forecast" gauge on the Log tab that predicts today's likely mood from recent momentum, your most common trigger, and time of day, with a plain-language reason and confidence level.
 - **Logging goals** — set a daily or weekly check-in target, track progress with a ring on the Log tab, and get a gentle, dismissable in-app nudge when you haven't logged today.
+- **Trigger insights** — on-device pattern detection in the Journal tab that surfaces your strongest personal levers, e.g. "Days you tagged Sleep lift your mood," with a strength meter.
 - **Local persistence** — entries, notes, and triggers are saved with `shared_preferences`, so your history survives app restarts.
 - Horizontal timeline of recent moods, color-coded by feeling and timestamped with `intl`.
 - State managed with [Riverpod](https://pub.dev/packages/flutter_riverpod) (`ProviderScope` + `StateNotifier`).
@@ -40,7 +41,8 @@ lib/
 │   ├── mood_trends_provider.dart  # Computed trends (distribution, streaks, triggers)
 │   ├── weekly_recap_provider.dart # 7-day recap: dominant mood, top trigger, best/worst day
 │   ├── mood_forecast_provider.dart# Today's mood forecast (momentum + triggers + time of day)
-│   └── goals_provider.dart        # Daily/weekly logging goal + nudge state (persisted)
+│   ├── goals_provider.dart        # Daily/weekly logging goal + nudge state (persisted)
+│   └── insights_provider.dart     # On-device trigger insights (personal patterns)
 ├── screens/
 │   ├── mood_home_screen.dart      # Tabbed main screen (Log / Timeline / Journal)
 │   └── mood_journal_screen.dart   # Journal tab — weekly recap + entries grouped by day
@@ -54,7 +56,8 @@ lib/
     ├── weekly_recap_card.dart     # "Your Week at a Glance" card with copy/share
     ├── mood_forecast_card.dart    # "Today's forecast" gauge with contributing factors
     ├── goal_progress_card.dart    # Progress ring + goal settings dialog
-    └── mood_nudge_banner.dart     # Gentle in-app "log your mood" nudge
+    ├── mood_nudge_banner.dart     # Gentle in-app "log your mood" nudge
+    └── trigger_insights_card.dart# "Your Patterns" — strongest personal insights
 ```
 
 ## Getting started
