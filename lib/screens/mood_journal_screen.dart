@@ -6,6 +6,7 @@ import '../models/mood.dart';
 import '../state/mood_entries_provider.dart';
 import '../widgets/mood_entry_edit_dialog.dart';
 import '../widgets/mood_face.dart';
+import '../widgets/mood_recovery_card.dart';
 import '../widgets/trigger_insights_card.dart';
 import '../widgets/weekly_recap_card.dart';
 
@@ -54,6 +55,13 @@ class MoodJournalScreen extends ConsumerWidget {
           child: Padding(
             padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
             child: TriggerInsightsCard(),
+          ),
+        ),
+        // Mood recovery patterns (mood -> next mood transitions).
+        const SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
+            child: MoodRecoveryCard(),
           ),
         ),
         SliverPadding(

@@ -148,6 +148,24 @@ void main() {
     expect(find.text('Trending up'), findsOneWidget);
   });
 
+  testWidgets('shows mood recovery patterns in the journal tab',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(const ProviderScope(child: MoodiaryApp()));
+    await tester.pumpAndSettle();
+
+    // Log 5 moods with a trigger so transitions are computable.
+    for (int i = 0; i < 5; i++) {
+      await _logMood(tester, note: 'Recov $i', withTrigger: true);
+    }
+
+    // Switch to the Journal tab.
+    await tester.tap(find.text('Journal'));
+    await tester.pumpAndSettle();
+
+    // The recovery card should appear with its heading.
+    expect(find.text('Mood Recovery Patterns'), findsOneWidget);
+  });
+
   testWidgets('shows trigger insights in the journal tab',
       (WidgetTester tester) async {
     await tester.pumpWidget(const ProviderScope(child: MoodiaryApp()));
