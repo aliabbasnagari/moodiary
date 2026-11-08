@@ -148,6 +148,39 @@ void main() {
     expect(find.text('Trending up'), findsOneWidget);
   });
 
+  testWidgets('filters journal entries by mood',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(const ProviderScope(child: MoodiaryApp()));
+    await tester.pumpAndSettle();
+
+    // Log one Happy with a note, one Sad with a different note.
+    await _logMood(tester, note: 'Happy note', withTrigger: true);
+    await _logMood(tester, note: 'Sad note', withTrigger: true);
+
+    // Switch to the Journal tab.
+    await tester.tap(find.text('Journal'));
+    await tester.pumpAndSettle();
+
+    // Both notes visible initially.
+    expect(find.text('Happy note'), findsOneWidget);
+    expect(find.text('Sad note'), findsOneWidget);
+
+    // Tap the "Sad" mood chip to filter.
+    await tester.tap(find.text('Sad'));
+    await tester.pumpAndSettle();
+
+    // Only the Sad entry should remain.
+    expect(find.text('Happy note'), findsNothing);
+    expect(find.text('Sad note'), findsOneWidget);
+
+    // Clear all.
+    await tester.tap(find.text('Clear all'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Happy note'), findsOneWidget);
+    expect(find.text('Sad note'), findsOneWidget);
+  });
+
   testWidgets('shows mood recovery patterns in the journal tab',
       (WidgetTester tester) async {
     await tester.pumpWidget(const ProviderScope(child: MoodiaryApp()));

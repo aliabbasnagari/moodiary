@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../models/mood.dart';
+import '../state/journal_filter_provider.dart';
 import '../state/mood_entries_provider.dart';
+import '../widgets/journal_filter_bar.dart';
 import '../widgets/mood_entry_edit_dialog.dart';
 import '../widgets/mood_face.dart';
 import '../widgets/mood_recovery_card.dart';
@@ -15,9 +17,10 @@ class MoodJournalScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final entries = ref.watch(moodEntriesProvider);
+    final allEntries = ref.watch(moodEntriesProvider);
+    final filter = ref.watch(journalFilterProvider);
 
-    if (entries.isEmpty) {
+    if (allEntries.isEmpty) {
       return Center(
         child: Text(
           'No moods logged yet.',
@@ -25,6 +28,41 @@ class MoodJournalScreen extends ConsumerWidget {
             context,
           ).textTheme.bodyMedium?.copyWith(color: Colors.black54),
         ),
+      );
+    }
+
+    final entries =
+        allEntries.where(filter.matches).toList(growable: false);
+
+    if (entries.isEmpty) {
+      return Column(
+        children: [
+          const SizedBox(height: 16),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: JournalFilterBar(),
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.filter_alt_off,
+                      size: 36, color: Colors.black38),
+                  const SizedBox(height: 8),
+                  Text(
+                    'No entries match your filters.',
+                    style:
+                        Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: Colors.black54,
+                            ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       );
     }
 
@@ -43,6 +81,13 @@ class MoodJournalScreen extends ConsumerWidget {
 
     return CustomScrollView(
       slivers: [
+        // Filter bar pinned at the very top.
+        const SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: JournalFilterBar(),
+          ),
+        ),
         // Weekly recap pinned at the top (only shown when the week has data).
         const SliverToBoxAdapter(
           child: Padding(
