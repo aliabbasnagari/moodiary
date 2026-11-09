@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/mood.dart';
+import '../widgets/forecast_accuracy_card.dart';
 import '../widgets/goal_progress_card.dart';
 import '../widgets/mood_forecast_card.dart';
 import '../widgets/mood_nudge_banner.dart';
@@ -90,6 +91,7 @@ class _MoodHomeScreenState extends State<MoodHomeScreen>
         const SizedBox(height: 24),
         const GoalProgressCard(),
         const MoodForecastCard(),
+        const ForecastAccuracyCard(),
         const SizedBox(height: 16),
         Text(
           'Recent moods',

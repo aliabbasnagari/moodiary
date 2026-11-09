@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/mood.dart';
 import '../models/trigger.dart';
+import 'forecast_accuracy_provider.dart';
 import 'mood_entries_provider.dart';
 
 const _moodScores = {
@@ -158,7 +159,26 @@ MoodForecast _build(List<MoodEntry> entries) {
 }
 
 /// A one-day-ahead style forecast derived from all logged entries.
+///
+/// Side effect: whenever the forecast changes, a pending snapshot is recorded
+/// so tomorrow's accuracy can be computed.
 final moodForecastProvider = Provider<MoodForecast>((ref) {
   final entries = ref.watch(moodEntriesProvider);
-  return _build(entries);
+  final forecast = _build(entries);
+  final today = _dayKey(DateTime.now());
+  final predicted = _predictedMood(forecast.score);
+  ref
+      .read(forecastAccuracyProvider.notifier)
+      .recordToday(today: today, predicted: predicted);
+  return forecast;
 });
+
+String _dayKey(DateTime d) => '${d.year}-${d.month}-${d.day}';
+
+Mood _predictedMood(double score) {
+  if (score >= 0.7) return Mood.happy;
+  if (score >= 0.5) return Mood.good;
+  if (score >= 0.35) return Mood.neutral;
+  if (score >= 0.2) return Mood.sad;
+  return Mood.awful;
+}

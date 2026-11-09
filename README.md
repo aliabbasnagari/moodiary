@@ -16,6 +16,7 @@ A simple, cheerful Flutter app for logging how you feel. Tap a face to record yo
 - **Mood recovery patterns** — a transition grid in the Journal tab showing how your mood usually flows from one day to the next (e.g. "After Awful, you usually recover to Good"), highlighting resilience.
 - **Journal search & filters** — a search box plus mood/date filter chips in the Journal tab, so you can find a specific past entry by note, response, mood, or time range.
 - **Streaks & highlights** — a "Your Highlights" card in the Journal tab celebrating your all-time longest streak, your 5 happiest days (with their notes and triggers), and your day-1 milestone.
+- **Forecast accuracy** — a calibration strip on the Log tab showing how often the app's mood forecasts have been right, with a running hit-rate and recent-streak counter.
 - **Local persistence** — entries, notes, and triggers are saved with `shared_preferences`, so your history survives app restarts.
 - Horizontal timeline of recent moods, color-coded by feeling and timestamped with `intl`.
 - State managed with [Riverpod](https://pub.dev/packages/flutter_riverpod) (`ProviderScope` + `StateNotifier`).

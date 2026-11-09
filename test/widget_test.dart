@@ -148,6 +148,20 @@ void main() {
     expect(find.text('Trending up'), findsOneWidget);
   });
 
+  testWidgets('shows forecast accuracy card on the log tab',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(const ProviderScope(child: MoodiaryApp()));
+    await tester.pumpAndSettle();
+
+    // Log a mood so the forecast (and accuracy tracker) have data.
+    await _logMood(tester, note: 'Accuracy test');
+
+    // The accuracy card should render with its heading.
+    expect(find.text('Forecast accuracy'), findsOneWidget);
+    // The calibration strip label should also be present.
+    expect(find.textContaining('forecast'), findsWidgets);
+  });
+
   testWidgets('shows highlights card in the journal tab',
       (WidgetTester tester) async {
     await tester.pumpWidget(const ProviderScope(child: MoodiaryApp()));
