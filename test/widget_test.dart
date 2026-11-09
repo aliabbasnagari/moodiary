@@ -148,6 +148,23 @@ void main() {
     expect(find.text('Trending up'), findsOneWidget);
   });
 
+  testWidgets('shows highlights card in the journal tab',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(const ProviderScope(child: MoodiaryApp()));
+    await tester.pumpAndSettle();
+
+    // Log a mood so highlights have data.
+    await _logMood(tester, note: 'Highlight test', withTrigger: true);
+
+    // Switch to the Journal tab.
+    await tester.tap(find.text('Journal'));
+    await tester.pumpAndSettle();
+
+    // The highlights card should appear with its heading.
+    expect(find.text('Your Highlights'), findsOneWidget);
+    expect(find.textContaining('-day streak'), findsOneWidget);
+  });
+
   testWidgets('filters journal entries by mood',
       (WidgetTester tester) async {
     await tester.pumpWidget(const ProviderScope(child: MoodiaryApp()));

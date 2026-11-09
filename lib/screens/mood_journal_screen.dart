@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../models/mood.dart';
 import '../state/journal_filter_provider.dart';
 import '../state/mood_entries_provider.dart';
+import '../widgets/highlights_card.dart';
 import '../widgets/journal_filter_bar.dart';
 import '../widgets/mood_entry_edit_dialog.dart';
 import '../widgets/mood_face.dart';
@@ -107,6 +108,13 @@ class MoodJournalScreen extends ConsumerWidget {
           child: Padding(
             padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
             child: MoodRecoveryCard(),
+          ),
+        ),
+        // All-time highlights (longest streak, happiest days).
+        const SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
+            child: HighlightsCard(),
           ),
         ),
         SliverPadding(

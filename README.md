@@ -15,6 +15,7 @@ A simple, cheerful Flutter app for logging how you feel. Tap a face to record yo
 - **Trigger insights** — on-device pattern detection in the Journal tab that surfaces your strongest personal levers, e.g. "Days you tagged Sleep lift your mood," with a strength meter.
 - **Mood recovery patterns** — a transition grid in the Journal tab showing how your mood usually flows from one day to the next (e.g. "After Awful, you usually recover to Good"), highlighting resilience.
 - **Journal search & filters** — a search box plus mood/date filter chips in the Journal tab, so you can find a specific past entry by note, response, mood, or time range.
+- **Streaks & highlights** — a "Your Highlights" card in the Journal tab celebrating your all-time longest streak, your 5 happiest days (with their notes and triggers), and your day-1 milestone.
 - **Local persistence** — entries, notes, and triggers are saved with `shared_preferences`, so your history survives app restarts.
 - Horizontal timeline of recent moods, color-coded by feeling and timestamped with `intl`.
 - State managed with [Riverpod](https://pub.dev/packages/flutter_riverpod) (`ProviderScope` + `StateNotifier`).
@@ -46,7 +47,8 @@ lib/
 │   ├── goals_provider.dart        # Daily/weekly logging goal + nudge state (persisted)
 │   ├── insights_provider.dart     # On-device trigger insights (personal patterns)
 │   ├── recovery_provider.dart     # Mood->mood recovery patterns (transitions)
-│   └── journal_filter_provider.dart # Journal search + mood/date filter state
+│   ├── journal_filter_provider.dart # Journal search + mood/date filter state
+│   └── highlights_provider.dart   # Longest streak, top 5 happiest days, day-1
 ├── screens/
 │   ├── mood_home_screen.dart      # Tabbed main screen (Log / Timeline / Journal)
 │   └── mood_journal_screen.dart   # Journal tab — weekly recap + entries grouped by day
@@ -63,7 +65,8 @@ lib/
     ├── mood_nudge_banner.dart     # Gentle in-app "log your mood" nudge
     ├── trigger_insights_card.dart # "Your Patterns" — strongest personal insights
     ├── mood_recovery_card.dart    # "Mood Recovery Patterns" — transition grid
-    └── journal_filter_bar.dart    # Search + mood/date filter chips
+    ├── journal_filter_bar.dart    # Search + mood/date filter chips
+    └── highlights_card.dart       # "Your Highlights" — streak + happiest days
 ```
 
 ## Getting started
