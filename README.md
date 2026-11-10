@@ -38,6 +38,7 @@ lib/
 │   ├── mood.dart                  # Mood enum + MoodEntry model
 │   ├── trigger.dart               # Trigger enum (mood trigger categories)
 │   ├── goal.dart                  # Logging goal (daily/weekly target)
+│   ├── forecast_snapshot.dart     # One-day forecast + actual outcome
 │   └── mood_entry_serializers.dart# JSON encode/decode for persistence
 ├── state/
 │   ├── mood_entries_provider.dart # Riverpod StateNotifier for entries (+ persistence)
@@ -49,7 +50,8 @@ lib/
 │   ├── insights_provider.dart     # On-device trigger insights (personal patterns)
 │   ├── recovery_provider.dart     # Mood->mood recovery patterns (transitions)
 │   ├── journal_filter_provider.dart # Journal search + mood/date filter state
-│   └── highlights_provider.dart   # Longest streak, top 5 happiest days, day-1
+│   ├── highlights_provider.dart   # Longest streak, top 5 happiest days, day-1
+│   └── forecast_accuracy_provider.dart # Daily forecast snapshots + hit rate
 ├── screens/
 │   ├── mood_home_screen.dart      # Tabbed main screen (Log / Timeline / Journal)
 │   └── mood_journal_screen.dart   # Journal tab — weekly recap + entries grouped by day
@@ -67,7 +69,8 @@ lib/
     ├── trigger_insights_card.dart # "Your Patterns" — strongest personal insights
     ├── mood_recovery_card.dart    # "Mood Recovery Patterns" — transition grid
     ├── journal_filter_bar.dart    # Search + mood/date filter chips
-    └── highlights_card.dart       # "Your Highlights" — streak + happiest days
+    ├── highlights_card.dart       # "Your Highlights" — streak + happiest days
+    └── forecast_accuracy_card.dart # "Forecast accuracy" — hit-rate calibration
 ```
 
 ## Getting started
