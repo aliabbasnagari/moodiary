@@ -3,36 +3,38 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:moodiary/main.dart';
+import 'package:moodiary/models/mood.dart';
+import 'package:moodiary/widgets/journal_filter_bar.dart';
+import 'package:moodiary/widgets/mood_entry_edit_dialog.dart';
+import 'package:moodiary/widgets/mood_logging_sheet.dart';
 
 Future<void> _logMood(WidgetTester tester,
-    {String note = '', bool withTrigger = false}) async {
-  // Tap Happy face to open prompt selector dialog
-  await tester.tap(find.text('Happy'));
-  await tester.pump();
+    {String note = '',
+    bool withTrigger = false,
+    Mood mood = Mood.happy}) async {
+  // Tap the face to open the logging sheet.
+  await tester.tap(find.text(mood.label));
+  await tester.pumpAndSettle();
 
-  // Pick the first prompt
-  await tester.tap(find.text('What made today a great day?'));
-  await tester.pump();
-
-  // Handle triggers
+  // Select a trigger chip if requested (scoped to the sheet so it doesn't
+  // match the "Sleep" chip that appears on the timeline after the first log).
+  final sheet = find.byType(MoodLoggingSheet);
   if (withTrigger) {
-    await tester.tap(find.text('Sleep'));
-    await tester.pump();
-    await tester.tap(find.text('Continue (1)'));
-    await tester.pump();
-  } else {
-    await tester.tap(find.text('Skip'));
+    await tester.tap(find.descendant(of: sheet, matching: find.text('Sleep')));
     await tester.pump();
   }
 
-  // Fill the note field (second TextField) if provided
+  // Fill the note field (second TextField in the sheet) if provided.
   if (note.isNotEmpty) {
-    await tester.enterText(find.byType(TextField).at(1), note);
+    await tester.enterText(
+      find.descendant(of: sheet, matching: find.byType(TextField)).at(1),
+      note,
+    );
     await tester.pump();
   }
 
-  // Tap Log button to confirm
-  await tester.tap(find.text('Log'));
+  // Tap the save button to log the mood.
+  await tester.tap(find.text('Log ${mood.label}'));
   await tester.pump();
   await tester.pump(const Duration(milliseconds: 300));
 }
@@ -44,8 +46,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('How are you feeling?'), findsOneWidget);
-    expect(find.text('No moods yet — tap a face above to log one.'),
-        findsOneWidget);
+    expect(find.text('No moods yet'), findsOneWidget);
 
     await _logMood(tester);
 
@@ -87,8 +88,13 @@ void main() {
     await tester.tap(find.byTooltip('Edit entry'));
     await tester.pump();
 
-    // Change the note
-    await tester.enterText(find.byType(TextField), 'Edited note');
+    // Change the note (scoped to the edit dialog).
+    await tester.enterText(
+      find.descendant(
+          of: find.byType(MoodEntryEditDialog),
+          matching: find.byType(TextField)),
+      'Edited note',
+    );
     await tester.pump();
 
     // Save
@@ -184,9 +190,10 @@ void main() {
     await tester.pumpWidget(const ProviderScope(child: MoodiaryApp()));
     await tester.pumpAndSettle();
 
-    // Log one Happy with a note, one Sad with a different note.
+    // Log one Happy and one Sad, each with a different note.
     await _logMood(tester, note: 'Happy note', withTrigger: true);
-    await _logMood(tester, note: 'Sad note', withTrigger: true);
+    await _logMood(tester,
+        note: 'Sad note', withTrigger: true, mood: Mood.sad);
 
     // Switch to the Journal tab.
     await tester.tap(find.text('Journal'));
@@ -196,8 +203,10 @@ void main() {
     expect(find.text('Happy note'), findsOneWidget);
     expect(find.text('Sad note'), findsOneWidget);
 
-    // Tap the "Sad" mood chip to filter.
-    await tester.tap(find.text('Sad'));
+    // Tap the "Sad" mood chip to filter (scoped to the filter bar so it
+    // doesn't match the "Sad" label on the journal entry card).
+    await tester.tap(find.descendant(
+        of: find.byType(JournalFilterBar), matching: find.text('Sad')));
     await tester.pumpAndSettle();
 
     // Only the Sad entry should remain.
@@ -235,10 +244,13 @@ void main() {
     await tester.pumpWidget(const ProviderScope(child: MoodiaryApp()));
     await tester.pumpAndSettle();
 
-    // Log 5 Happy moods with the Sleep trigger so the pattern is detectable.
-    for (int i = 0; i < 5; i++) {
+    // Log 3 Happy days tagged with Sleep and 2 untagged Awful days so a
+    // real pattern emerges: Sleep days are happier than the overall average.
+    for (int i = 0; i < 3; i++) {
       await _logMood(tester, note: 'Recap $i', withTrigger: true);
     }
+    await _logMood(tester, note: 'Rough one', mood: Mood.awful);
+    await _logMood(tester, note: 'Rough two', mood: Mood.awful);
 
     // Switch to the Journal tab.
     await tester.tap(find.text('Journal'));

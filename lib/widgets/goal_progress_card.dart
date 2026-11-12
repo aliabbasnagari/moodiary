@@ -65,7 +65,7 @@ class GoalProgressCard extends ConsumerWidget {
                       ),
                       Text(
                         done
-                            ? 'Goal reached! '
+                            ? 'Goal reached!'
                             : '$current of $target logged',
                         style: Theme.of(context).textTheme.titleSmall?.copyWith(
                               fontWeight: FontWeight.w700,

@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/mood.dart';
-import '../models/trigger.dart';
-import '../state/mood_entries_provider.dart';
 import '../state/mood_prompts_provider.dart';
 import 'mood_face.dart';
+import 'mood_logging_sheet.dart';
 
 /// Row of tappable mood faces that lets the user log how they feel.
 class MoodPicker extends ConsumerWidget {
@@ -27,7 +26,7 @@ class MoodPicker extends ConsumerWidget {
               _MoodPickerButton(
                 mood: mood,
                 size: faceSize,
-                onTap: () => _showPromptDialog(context, ref, mood),
+                onTap: () => _showLoggingSheet(context, mood),
               ),
           ],
         );
@@ -35,103 +34,17 @@ class MoodPicker extends ConsumerWidget {
     );
   }
 
-  void _showPromptDialog(
-    BuildContext context,
-    WidgetRef ref,
-    Mood mood,
-  ) async {
-    final moodCategory = _toMoodCategory(mood);
-    final prompts = promptsByMood[moodCategory] ?? [];
-
-    if (prompts.isEmpty) {
-      _showNoteDialog(context, ref, mood, null, const []);
-      return;
-    }
-
-    final selectedPrompt = await showDialog<MoodPrompt?>(
+  static void _showLoggingSheet(BuildContext context, Mood mood) {
+    final prompts = promptsByMood[_toCategory(mood)] ?? const [];
+    showModalBottomSheet<void>(
       context: context,
-      builder: (context) => _PromptSelectorDialog(
-        mood: mood,
-        prompts: prompts,
-      ),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => MoodLoggingSheet(mood: mood, prompts: prompts),
     );
-
-    if (selectedPrompt != null) {
-      final selectedTriggers = await showDialog<List<Trigger>>(
-        context: context,
-        builder: (context) => _TriggerPickerDialog(mood: mood),
-      );
-
-      if (selectedTriggers != null) {
-        final noteAndResponse = await showDialog<_NoteAndResponse?>(
-          context: context,
-          builder: (context) => _NoteAndResponseDialog(
-            mood: mood,
-            prompt: selectedPrompt,
-          ),
-        );
-
-        if (noteAndResponse != null) {
-          ref.read(moodEntriesProvider.notifier).log(
-                mood,
-                noteAndResponse.note,
-                promptResponse: noteAndResponse.response,
-                triggers: selectedTriggers,
-              );
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(
-              SnackBar(
-                duration: const Duration(milliseconds: 1200),
-                backgroundColor: mood.color,
-                content: Text(
-                  'Logged: ${mood.label}',
-                  style: const TextStyle(color: Colors.black87),
-                ),
-              ),
-            );
-        }
-      }
-    }
   }
 
-  void _showNoteDialog(
-    BuildContext context,
-    WidgetRef ref,
-    Mood mood,
-    String? promptResponse,
-    List<Trigger> triggers,
-  ) async {
-    final note = await showDialog<String?>(
-      context: context,
-      builder: (context) => _NoteDialog(mood: mood),
-    );
-
-    if (note != null) {
-      ref.read(moodEntriesProvider.notifier).log(
-            mood,
-            note,
-            promptResponse: promptResponse,
-            triggers: triggers,
-          );
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            duration: const Duration(milliseconds: 1200),
-            backgroundColor: mood.color,
-            content: Text(
-              note.isEmpty
-                  ? 'Logged: ${mood.label}'
-                  : 'Logged: ${mood.label} - ${note}',
-              style: const TextStyle(color: Colors.black87),
-            ),
-          ),
-        );
-    }
-  }
-
-  MoodCategory _toMoodCategory(Mood mood) {
+  static MoodCategory _toCategory(Mood mood) {
     switch (mood) {
       case Mood.happy:
         return MoodCategory.happy;
@@ -189,279 +102,6 @@ class _MoodPickerButtonState extends State<_MoodPickerButton> {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _NoteAndResponse {
-  final String? note;
-  final String? response;
-
-  const _NoteAndResponse({required this.note, required this.response});
-}
-
-class _PromptSelectorDialog extends StatelessWidget {
-  final Mood mood;
-  final List<MoodPrompt> prompts;
-
-  const _PromptSelectorDialog({
-    required this.mood,
-    required this.prompts,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text('Log ${mood.label}'),
-      content: SizedBox(
-        width: 300,
-        height: 250,
-        child: ListView.builder(
-          itemCount: prompts.length,
-          itemBuilder: (context, index) {
-            return ListTile(
-              title: Text(prompts[index].question),
-              onTap: () => Navigator.pop(context, prompts[index]),
-            );
-          },
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
-        ),
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('No Prompt'),
-        ),
-      ],
-    );
-  }
-}
-
-class _TriggerPickerDialog extends StatefulWidget {
-  final Mood mood;
-
-  const _TriggerPickerDialog({required this.mood});
-
-  @override
-  State<_TriggerPickerDialog> createState() => _TriggerPickerDialogState();
-}
-
-class _TriggerPickerDialogState extends State<_TriggerPickerDialog> {
-  final Set<Trigger> _selected = <Trigger>{};
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('What affected your mood?'),
-      content: SizedBox(
-        width: 300,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'Tap all that apply. You can skip this step.',
-              style: TextStyle(color: Colors.black54),
-            ),
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final trigger in Trigger.values)
-                  _TriggerChip(
-                    trigger: trigger,
-                    selected: _selected.contains(trigger),
-                    onTap: () {
-                      setState(() {
-                        if (_selected.contains(trigger)) {
-                          _selected.remove(trigger);
-                        } else {
-                          _selected.add(trigger);
-                        }
-                      });
-                    },
-                  ),
-              ],
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Skip'),
-        ),
-        FilledButton(
-          onPressed: () => Navigator.pop(context, _selected.toList()),
-          child: Text(
-            _selected.isEmpty ? 'Continue' : 'Continue (${_selected.length})',
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _TriggerChip extends StatelessWidget {
-  final Trigger trigger;
-  final bool selected;
-  final VoidCallback onTap;
-
-  const _TriggerChip({
-    required this.trigger,
-    required this.selected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ActionChip(
-      avatar: Icon(
-        trigger.icon,
-        size: 16,
-        color: selected ? Colors.white : trigger.color,
-      ),
-      label: Text(trigger.label),
-      backgroundColor: selected ? trigger.color : trigger.color.withValues(alpha: 0.1),
-      side: BorderSide(
-        color: trigger.color,
-        width: 1,
-      ),
-      labelStyle: TextStyle(
-        color: selected ? Colors.white : Colors.black87,
-        fontSize: 13,
-      ),
-      onPressed: onTap,
-    );
-  }
-}
-
-class _NoteAndResponseDialog extends StatefulWidget {
-  final Mood mood;
-  final MoodPrompt prompt;
-
-  const _NoteAndResponseDialog({
-    required this.mood,
-    required this.prompt,
-  });
-
-  @override
-  State<_NoteAndResponseDialog> createState() => _NoteAndResponseDialogState();
-}
-
-class _NoteAndResponseDialogState extends State<_NoteAndResponseDialog> {
-  final _noteController = TextEditingController();
-  final _responseController = TextEditingController();
-
-  @override
-  void dispose() {
-    _noteController.dispose();
-    _responseController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text('Log ${widget.mood.label}'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(widget.prompt.question),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _responseController,
-            autofocus: true,
-            decoration: const InputDecoration(
-              labelText: 'Your response',
-              border: OutlineInputBorder(),
-            ),
-            maxLines: 3,
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _noteController,
-            decoration: const InputDecoration(
-              labelText: 'Add a note (optional)',
-              border: OutlineInputBorder(),
-            ),
-            maxLines: 2,
-          ),
-        ],
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
-        ),
-        TextButton(
-          onPressed: () => Navigator.pop(
-            context,
-            _NoteAndResponse(
-              note: _noteController.text,
-              response: _responseController.text,
-            ),
-          ),
-          child: const Text('Log'),
-        ),
-      ],
-    );
-  }
-}
-
-class _NoteDialog extends StatefulWidget {
-  final Mood mood;
-
-  const _NoteDialog({required this.mood});
-
-  @override
-  State<_NoteDialog> createState() => _NoteDialogState();
-}
-
-class _NoteDialogState extends State<_NoteDialog> {
-  final _controller = TextEditingController();
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text('Log ${widget.mood.label}'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('How are you feeling?'),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _controller,
-            autofocus: true,
-            decoration: const InputDecoration(
-              labelText: 'Add a note (optional)',
-              border: OutlineInputBorder(),
-            ),
-            maxLines: 3,
-          ),
-        ],
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
-        ),
-        TextButton(
-          onPressed: () => Navigator.pop(context, _controller.text),
-          child: const Text('Log'),
-        ),
-      ],
     );
   }
 }
