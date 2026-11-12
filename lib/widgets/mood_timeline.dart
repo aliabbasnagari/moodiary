@@ -26,7 +26,9 @@ class MoodTimeline extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         itemCount: entries.length,
         separatorBuilder: (_, _) => const SizedBox(width: 12),
-        itemBuilder: (context, i) => _TimelineCard(entry: entries[i]),
+        itemBuilder: (context, i) => Center(
+          child: _TimelineCard(entry: entries[i]),
+        ),
       ),
     );
   }
@@ -131,63 +133,35 @@ class _TimelineCardState extends ConsumerState<_TimelineCard>
                   ],
                 ),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     MoodFace(
                       mood: entry.mood,
-                      size: 88.0,
+                      size: 72.0,
                       animation: _controller.value,
                     ),
+                    const SizedBox(height: 6),
                     Column(
                       children: [
                         if (entry.triggers.isNotEmpty)
                           Padding(
-                            padding: const EdgeInsets.only(bottom: 6),
-                            child: Wrap(
-                              spacing: 4,
-                              runSpacing: 4,
-                              alignment: WrapAlignment.center,
+                            padding: const EdgeInsets.only(bottom: 4),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                for (final trigger in entry.triggers)
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 6,
-                                      vertical: 2,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color:
-                                          trigger.color.withValues(alpha: 0.12),
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(
-                                          trigger.icon,
-                                          size: 11,
-                                          color: trigger.color,
-                                        ),
-                                        const SizedBox(width: 3),
-                                        Text(
-                                          trigger.label,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .labelSmall
-                                              ?.copyWith(
-                                                color: Colors.black87,
-                                                fontSize: 10,
-                                              ),
-                                        ),
-                                      ],
-                                    ),
+                                for (final trigger
+                                    in entry.triggers.take(2))
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 4),
+                                    child: _TriggerChip(trigger: trigger),
                                   ),
                               ],
                             ),
                           ),
                         if (entry.note != null && entry.note!.isNotEmpty)
                           Padding(
-                            padding: const EdgeInsets.only(bottom: 6),
+                            padding: const EdgeInsets.only(bottom: 4),
                             child: Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 10,
@@ -242,11 +216,11 @@ class _TimelineCardState extends ConsumerState<_TimelineCard>
                                 color: Colors.black54,
                               ),
                         ),
-                        const SizedBox(height: 6),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            _CardActionIcon(
+                         const SizedBox(height: 4),
+                         Row(
+                           mainAxisSize: MainAxisSize.min,
+                           children: [
+                             _CardActionIcon(
                               icon: Icons.edit_outlined,
                               tooltip: 'Edit entry',
                               onTap: () => _showEditDialog(context),
@@ -342,6 +316,37 @@ class _CardActionIcon extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         onTap: onTap,
         child: Icon(icon, size: 16, color: Colors.black54),
+      ),
+    );
+  }
+}
+
+class _TriggerChip extends StatelessWidget {
+  const _TriggerChip({required this.trigger});
+
+  final Trigger trigger;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: trigger.color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(trigger.icon, size: 11, color: trigger.color),
+          const SizedBox(width: 3),
+          Text(
+            trigger.label,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: Colors.black87,
+                  fontSize: 10,
+                ),
+          ),
+        ],
       ),
     );
   }
