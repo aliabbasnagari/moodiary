@@ -48,7 +48,7 @@ class _MoodHomeScreenState extends State<MoodHomeScreen>
           unselectedLabelColor: Colors.black38,
           indicatorColor: const Color(0xFFE6A817),
           indicatorWeight: 3,
-          indicatorSize: TabIndicatorSize.label,
+          indicatorSize: TabBarIndicatorSize.label,
           labelStyle: const TextStyle(fontWeight: FontWeight.w600),
           tabs: const [
             Tab(text: 'Log'),

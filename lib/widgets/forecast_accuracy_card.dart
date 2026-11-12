@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../models/mood.dart';
+import '../models/forecast_snapshot.dart';
 import '../state/forecast_accuracy_provider.dart';
 
 /// A card showing how accurate the app's forecasts have been.
