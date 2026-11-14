@@ -31,6 +31,8 @@ A simple, cheerful Flutter app for logging how you feel. Tap a face to record yo
 
 ## Project structure
 
+
+
 ```
 lib/
 ├── main.dart                      # App entry point, theme, ProviderScope
