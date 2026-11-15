@@ -31,8 +31,6 @@ A simple, cheerful Flutter app for logging how you feel. Tap a face to record yo
 
 ## Project structure
 
-
-
 ```
 lib/
 ├── main.dart                      # App entry point, theme, ProviderScope
@@ -74,7 +72,6 @@ lib/
     ├── highlights_card.dart       # "Your Highlights" — streak + happiest days
     └── forecast_accuracy_card.dart # "Forecast accuracy" — hit-rate calibration
 ```
-
 
 ## Getting started
 
