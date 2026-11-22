@@ -75,6 +75,7 @@ lib/
 
 ## Getting started
 
+
 Prerequisites:
 
 - Flutter SDK (Dart `^3.11.5`)
